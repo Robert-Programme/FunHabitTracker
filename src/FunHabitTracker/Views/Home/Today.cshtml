@@ -41,32 +41,10 @@
                                             </label>
                                         </form>
                                     </div>
-                                </div>
-                                <span class="badge @(habit.IsDoneToday ? "bg-success" : "bg-secondary")">
+        badge @(habit.IsDoneToday ? "bg-success" : "bg-secondary")">
                                     @(habit.IsDoneToday ? "✓ Erledigt" : "Nicht erledigt")
                                 </span>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-        </section>
-
-        <section class="add-habit mt-5">
-            <h2>Neues Habit erstellen</h2>
-            <form asp-action="AddHabit" method="post" class="form-group">
-                @Html.AntiForgeryToken()
-                <div class="mb-3">
-                    <input type="text" name="name" placeholder="Habit Name" class="form-control" required />
-                </div>
-                <div class="mb-3">
-                    <input type="text" name="description" placeholder="Beschreibung (optional)" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <input type="text" name="frequency" placeholder="Häufigkeit (z.B. Täglich)" class="form-control" value="Täglich" />
-                </div>
-                <button type="submit" class="btn btn-primary">Habit erstellen</button>
-            </form>
+        
         </section>
     </main>
 </div>
