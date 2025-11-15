@@ -11,10 +11,10 @@
         <h1>Fun Habit Tracker</h1>
         <nav>
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/Habits">My Habits</a></li>
-                <li><a href="/About">About</a></li>
-            </ul>
+                    <li><a asp-controller="Home" asp-action="Today">Heute</a></li>
+            <li><a asp-controller="Habits" asp-action="Index">Alle Habits</a></li>
+            <li><a asp-controller="Habits" asp-action="Create">Neues Habit</a></li>
+        </ul>ul>
         </nav>
     </header>
     <main role="main" class="container">
