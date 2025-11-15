@@ -1,0 +1,49 @@
+@model IEnumerable<FunHabitTracker.Models.Habit>
+
+@{
+    ViewData["Title"] = "Alle Habits";
+}
+
+<h1>Alle Habits</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Neues Habit</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Es wurden noch keine Habits angelegt.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Beschreibung</th>
+                <th>Status</th>
+                <th>Erstellt am</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var habit in Model)
+        {
+            <tr>
+                <td>@habit.Name</td>
+                <td>@habit.Description</td>
+                <td>
+                    @if (habit.IsActive)
+                    {
+                        <span class="badge bg-success">Aktiv</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inaktiv</span>
+                    }
+                </td>
+                <td>@habit.CreatedAt.ToString("dd.MM.yyyy")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
