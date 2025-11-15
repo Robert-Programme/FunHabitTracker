@@ -14,7 +14,7 @@
             @if (Model.Habits.Count == 0)
             {
                 <div class="alert alert-info">
-                    <p>Du hast noch keine aktiven Habits. <a asp-action="AddHabit">Erstelle dein erstes Habit!</a></p>
+                    <p>Du hast noch keine aktiven Habits. <a asp-controller="Habits" asp-action="Create">Erstelle dein erstes Habit!</a></p>
                 </div>
             }
             else
