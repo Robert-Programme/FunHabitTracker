@@ -1,0 +1,95 @@
+@model FunHabitTracker.ViewModels.TodayViewModel
+@{
+    ViewData["Title"] = "Heute - Habit Tracker";
+}
+
+<div class="container mt-5">
+    <header>
+        <h1>Heute: @Model.Date.ToString("dddd, dd.MM.yyyy")</h1>
+        <p class="text-muted">Markiere deine Habits für heute als erledigt</p>
+    </header>
+
+    <main>
+        <section class="today-habits mt-4">
+            @if (Model.Habits.Count == 0)
+            {
+                <div class="alert alert-info">
+                    <p>Du hast noch keine aktiven Habits. <a asp-action="AddHabit">Erstelle dein erstes Habit!</a></p>
+                </div>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var habit in Model.Habits)
+                    {
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <div class="form-check">
+                                        <form asp-action="ToggleToday" asp-route-habitId="@habit.HabitId" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="checkbox" class="form-check-input" id="habit-@habit.HabitId" 
+                                                   @(habit.IsDoneToday ? "checked" : "") 
+                                                   onchange="this.form.submit()" />
+                                            <label class="form-check-label" for="habit-@habit.HabitId">
+                                                <strong>@habit.Name</strong>
+                                                @if (!string.IsNullOrEmpty(habit.Description))
+                                                {
+                                                    <br />
+                                                    <small class="text-muted">@habit.Description</small>
+                                                }
+                                            </label>
+                                        </form>
+                                    </div>
+                                </div>
+                                <span class="badge @(habit.IsDoneToday ? "bg-success" : "bg-secondary")">
+                                    @(habit.IsDoneToday ? "✓ Erledigt" : "Nicht erledigt")
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="add-habit mt-5">
+            <h2>Neues Habit erstellen</h2>
+            <form asp-action="AddHabit" method="post" class="form-group">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <input type="text" name="name" placeholder="Habit Name" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="description" placeholder="Beschreibung (optional)" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="frequency" placeholder="Häufigkeit (z.B. Täglich)" class="form-control" value="Täglich" />
+                </div>
+                <button type="submit" class="btn btn-primary">Habit erstellen</button>
+            </form>
+        </section>
+    </main>
+</div>
+
+<style>
+    .today-habits .list-group-item {
+        padding: 15px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .today-habits .form-check {
+        margin: 0;
+    }
+    
+    .today-habits .form-check-input {
+        cursor: pointer;
+        width: 1.25em;
+        height: 1.25em;
+    }
+    
+    .badge {
+        padding: 0.5em 0.75em;
+    }
+</style>

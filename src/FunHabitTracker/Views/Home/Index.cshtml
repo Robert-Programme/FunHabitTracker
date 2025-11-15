@@ -1,0 +1,46 @@
+@model FunHabitTracker.ViewModels.HomeIndexViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fun Habit Tracker</title>
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Welcome to Fun Habit Tracker!</h1>
+            <p>Track your habits and make them fun!</p>
+        </header>
+        <main>
+            <section>
+                <h2>Your Habits</h2>
+                <ul id="habitList">
+                    @foreach (var habit in Model.Habits)
+                    {
+                        <li>
+                            <strong>@habit.Name</strong> - @habit.Description
+                            <span class="frequency">Frequency: @habit.Frequency</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+            <section>
+                <h2>Add a New Habit</h2>
+                <form id="habitForm" method="post" action="/Home/AddHabit">
+                    @Html.AntiForgeryToken()
+                    <input type="text" name="name" placeholder="Habit Name" required />
+                    <input type="text" name="description" placeholder="Description" required />
+                    <input type="text" name="frequency" placeholder="Frequency (e.g., Daily, Weekly)" required />
+                    <button type="submit">Add Habit</button>
+                </form>
+            </section>
+        </main>
+        <footer>
+            <p>&copy; 2023 Fun Habit Tracker. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="~/js/site.js"></script>
+</body>
+</html>
