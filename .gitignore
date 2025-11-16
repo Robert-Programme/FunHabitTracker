@@ -1,0 +1,31 @@
+## Ignore build outputs
+bin/
+obj/
+**/bin/
+**/obj/
+
+## Visual Studio / Rider
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+/.idea/
+
+## EF / SQLite
+*.db
+*.db-shm
+*.db-wal
+habits.db
+
+## Logs
+*.log
+
+## Test output
+**/TestResults/
+**/coverage/
+
+## Misc
+*.DS_Store
+*.class
+bin-debug/
