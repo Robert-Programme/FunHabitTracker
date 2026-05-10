@@ -17,6 +17,7 @@ obj/
 *.db-shm
 *.db-wal
 habits.db
+.aspnet-data-protection-keys/
 
 ## Logs
 *.log

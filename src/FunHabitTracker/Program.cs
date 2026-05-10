@@ -1,14 +1,25 @@
+using System.IO;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using FunHabitTracker.Data;
 using FunHabitTracker.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Add services to the container
 builder.Services.AddControllersWithViews();
+var dataProtectionKeysPath = Path.Combine(builder.Environment.ContentRootPath, ".aspnet-data-protection-keys");
+Directory.CreateDirectory(dataProtectionKeysPath);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=habits.db"));
 builder.Services.AddScoped<HabitService>();
