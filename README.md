@@ -38,6 +38,19 @@ To get started with the Fun Habit Tracker, follow these steps:
 5. **Access the App**:
    Open your web browser and navigate to `http://localhost:5000` to start tracking your habits!
 
+## Factory Workflow
+
+Material changes use OpenSpec and repository-local verification gates:
+
+```powershell
+npm ci
+npm run openspec:validate
+npm run factory:all
+```
+
+See `docs/factory-process.md` and `AGENTS.md` for the change lifecycle,
+requirements, evidence, and Definition of Done.
+
 ## Contributing
 
 We welcome contributions! If you'd like to help improve the Fun Habit Tracker, please fork the repository and submit a pull request.
