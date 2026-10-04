@@ -1,51 +1,50 @@
 # Fun Habit Tracker
 
-Welcome to the Fun Habit Tracker! This application is designed to help you build and maintain positive habits in a fun and engaging way. Whether you're looking to exercise more, read daily, or drink enough water, this app will keep you motivated and on track!
+Fun Habit Tracker is a small ASP.NET Core MVC application for maintaining habits and
+recording whether each active habit was completed today. It stores local data in SQLite
+and renders the interface with Razor views.
 
-## Features
+## Implemented Features
 
-- **User-Friendly Interface**: Enjoy a clean and intuitive design that makes tracking your habits a breeze.
-- **Habit Management**: Easily add, update, and delete habits with just a few clicks.
-- **Progress Tracking**: Visualize your progress with fun charts and statistics.
-- **Reminders**: Set reminders to keep you accountable and motivated.
-- **Gamification**: Earn rewards and achievements as you reach your habit goals!
+- Create habits with a name, description, and frequency.
+- List configured habits.
+- View active habits for the current day.
+- Toggle today's completion state for each active habit.
+- Persist local habit and completion data in SQLite.
 
-## Getting Started
+## Requirements
 
-To get started with the Fun Habit Tracker, follow these steps:
+- .NET 6 SDK
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/FunHabitTracker.git
-   cd FunHabitTracker
-   ```
+## Run Locally
 
-2. **Open the Project**:
-   Open the project in your preferred IDE.
+```bash
+git clone https://github.com/Robert-Programme/FunHabitTracker.git
+cd FunHabitTracker
+dotnet restore
+dotnet run --project src/FunHabitTracker/FunHabitTracker.csproj --urls http://localhost:5016
+```
 
-3. **Restore Dependencies**:
-   Run the following command to restore the necessary packages:
-   ```bash
-   dotnet restore
-   ```
+Open `http://localhost:5016/Today` in a browser. The application creates its local
+SQLite database on first start.
 
-4. **Run the Application**:
-   Start the application using:
-   ```bash
-   dotnet run
-   ```
+## Tests
 
-5. **Access the App**:
-   Open your web browser and navigate to `http://localhost:5000` to start tracking your habits!
+```bash
+dotnet test FunHabitTracker.sln
+```
 
-## Contributing
+The current MSTest suite covers the `HabitService` CRUD behavior with an in-memory
+Entity Framework Core database.
 
-We welcome contributions! If you'd like to help improve the Fun Habit Tracker, please fork the repository and submit a pull request.
+## Project Structure
 
-## License
+- `src/FunHabitTracker/` contains the ASP.NET Core MVC application.
+- `tests/FunHabitTracker.Tests/` contains the MSTest project.
+- `FunHabitTracker.sln` is the solution entry point for build and test commands.
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Known Limitations
 
-## Acknowledgments
-
-Thanks to everyone who contributed to this project and to the open-source community for their support! Let's make habit tracking fun together!
+- The application uses local SQLite storage and has no authentication or multi-user model.
+- Automated coverage currently focuses on the service layer rather than controllers or Razor views.
+- Charts, reminders, rewards, and achievements are not implemented.

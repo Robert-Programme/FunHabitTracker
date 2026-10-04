@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const habitForm = document.getElementById('habit-form');
     const habitList = document.getElementById('habit-list');
 
+    if (!habitForm || !habitList) {
+        return;
+    }
+
     habitForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const habitName = document.getElementById('habit-name').value;
