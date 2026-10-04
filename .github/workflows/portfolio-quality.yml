@@ -1,0 +1,112 @@
+name: Portfolio Quality
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet restore FunHabitTracker.sln
+      - run: dotnet build FunHabitTracker.sln --configuration Release --no-restore
+
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet restore FunHabitTracker.sln
+      - run: dotnet test FunHabitTracker.sln --configuration Release --no-restore
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet restore FunHabitTracker.sln
+      - run: dotnet format FunHabitTracker.sln --verify-no-changes --no-restore
+
+  security:
+    name: security
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: github/codeql-action/init@1190a975f95ce23525efb6a3fc21ea29567c1b52
+        with:
+          languages: csharp
+      - uses: github/codeql-action/autobuild@1190a975f95ce23525efb6a3fc21ea29567c1b52
+      - uses: github/codeql-action/analyze@1190a975f95ce23525efb6a3fc21ea29567c1b52
+
+  dependency-scan:
+    name: dependency_scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet restore FunHabitTracker.sln
+      - name: Reject known vulnerable dependencies
+        shell: bash
+        run: |
+          dotnet list FunHabitTracker.sln package --vulnerable --include-transitive | tee vulnerability-report.txt
+          if grep -q "has the following vulnerable packages" vulnerability-report.txt; then
+            exit 1
+          fi
+
+  secret-scan:
+    name: secret_scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  traceability:
+    name: traceability
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate managed pull-request provenance
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_EVENT_NAME -ne "pull_request") {
+            Write-Output "Traceability applies to pull requests; push event accepted."
+            exit 0
+          }
+
+          $event = Get-Content -LiteralPath $env:GITHUB_EVENT_PATH -Raw | ConvertFrom-Json
+          $body = [string]$event.pull_request.body
+          if ($body -notmatch '<!-- portfolio-factory:execution-id=pfe-[a-f0-9]{16} -->') {
+            throw "Missing Portfolio Factory execution identity."
+          }
+          if ($body -notmatch '(?m)^- Source issue: https://github\.com/Robert-Programme/FunHabitTracker/issues/[0-9]+$') {
+            throw "Missing managed source issue reference."
+          }
