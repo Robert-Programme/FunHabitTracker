@@ -1,59 +1,86 @@
-using System.Threading.Tasks;
-using FunHabitTracker.Data;
+using FunHabitTracker.Infrastructure;
 using FunHabitTracker.Models;
+using FunHabitTracker.Services;
+using FunHabitTracker.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FunHabitTracker.Controllers;
 
-/// <summary>
-/// Provides CRUD actions for managing habits. Currently supports listing and
-/// creating new habits. Additional actions such as editing or deleting can be
-/// added later.
-/// </summary>
-public class HabitsController : Controller
+public sealed class HabitsController : Controller
 {
-    private readonly AppDbContext _context;
+    private readonly HabitService _habits;
+    private readonly DailyTrackingService _tracking;
+    private readonly ILocalDateProvider _localDate;
 
-    public HabitsController(AppDbContext context)
+    public HabitsController(HabitService habits, DailyTrackingService tracking, ILocalDateProvider localDate)
     {
-        _context = context;
+        _habits = habits;
+        _tracking = tracking;
+        _localDate = localDate;
     }
 
-    /// <summary>
-    /// Displays a list of all habits in the system regardless of their active
-    /// state.
-    /// </summary>
-    public async Task<IActionResult> Index()
-    {
-        var habits = await _context.Habits.OrderByDescending(h => h.CreatedAt).ToListAsync();
-        return View(habits);
-    }
+    public async Task<IActionResult> Index(CancellationToken cancellationToken) => View(await _habits.ListAsync(_localDate.Today, cancellationToken));
 
-    /// <summary>
-    /// Renders a form for creating a new habit.
-    /// </summary>
-    public IActionResult Create()
-    {
-        return View();
-    }
+    public IActionResult Create() => View(new HabitInputModel { StartDate = _localDate.Today });
 
-    /// <summary>
-    /// Accepts and processes the submission of a new habit. If validation passes
-    /// the habit is saved and the user is redirected to the list of habits.
-    /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Description,IsActive")] Habit habit)
+    public async Task<IActionResult> Create(HabitInputModel model, int[] weekdays, CancellationToken cancellationToken)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(habit);
-        }
+        RevalidateSchedule(model, weekdays);
+        if (!ModelState.IsValid) return View(model);
+        var id = await _habits.CreateAsync(model, cancellationToken);
+        TempData["Success"] = "Habit wurde erstellt.";
+        return RedirectToAction(nameof(History), new { id });
+    }
 
-        habit.CreatedAt = DateTime.Now;
-        _context.Habits.Add(habit);
-        await _context.SaveChangesAsync();
+    public async Task<IActionResult> Edit(int id, CancellationToken cancellationToken)
+    {
+        var model = await _habits.GetInputAsync(id, cancellationToken);
+        return model is null ? NotFound() : View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(HabitInputModel model, int[] weekdays, CancellationToken cancellationToken)
+    {
+        RevalidateSchedule(model, weekdays);
+        if (!ModelState.IsValid) return View(model);
+        if (!await _habits.UpdateAsync(model, cancellationToken)) return NotFound();
+        TempData["Success"] = "Aenderungen wurden gespeichert.";
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Archive(int id, CancellationToken cancellationToken)
+    {
+        if (!await _habits.ArchiveAsync(id, cancellationToken)) return NotFound();
+        TempData["Success"] = "Habit wurde archiviert.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Restore(int id, CancellationToken cancellationToken)
+    {
+        if (!await _habits.RestoreAsync(id, cancellationToken)) return NotFound();
+        TempData["Success"] = "Habit ist wieder aktiv.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> History(int id, CancellationToken cancellationToken)
+    {
+        var model = await _tracking.GetHistoryAsync(id, _localDate.Today, cancellationToken: cancellationToken);
+        return model is null ? NotFound() : View(model);
+    }
+
+    private void RevalidateSchedule(HabitInputModel model, int[] weekdays)
+    {
+        model.ScheduledDays = model.RecurrenceType == RecurrenceType.Daily
+            ? ScheduledDays.EveryDay
+            : weekdays.Aggregate(ScheduledDays.None, (current, value) => current | (ScheduledDays)value);
+        ModelState.Clear();
+        TryValidateModel(model);
     }
 }

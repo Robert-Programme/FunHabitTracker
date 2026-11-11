@@ -1,0 +1,67 @@
+{
+  "requirements": [
+    {
+      "id": "USABILITY-001",
+      "statement": "The compact desktop window remains discoverable after Minimize and recoverable after Minimize or close-to-tray without creating a second owner.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Taskbar and Alt-Tab retain minimized compact window", "Close preserves tray owner", "Repeated launch restores existing window", "Quit removes endpoint"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopLifecycleTests.cs", "tests/windows/desktop-window-acceptance.ps1"], "evidence": ["artifacts/evidence/desktop-window-acceptance.md", "artifacts/evidence/desktop-window-chrome.png"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/DesktopBrowserWindow.cs", "src/FunHabitTracker.Desktop/DesktopCoordinator.cs"]
+    },
+    {
+      "id": "USABILITY-002",
+      "statement": "Compact and full windows expose only appropriate native commands and share the committed product identity.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Compact retains resize and minimize without maximize", "Full retains maximize", "Titles and multi-size product icon are present"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopLifecycleTests.cs", "tests/windows/desktop-window-acceptance.ps1"], "evidence": ["artifacts/evidence/desktop-window-chrome.png"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/DesktopBrowserWindow.cs", "src/FunHabitTracker.Desktop/FunHabitTracker.Desktop.csproj", "src/FunHabitTracker.Desktop/Assets/app-icon.ico"]
+    },
+    {
+      "id": "USABILITY-003",
+      "statement": "The full Today status marker is an accessible server-rendered Pending-to-Done toggle.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Pending marker sets Done", "Done marker returns to Pending", "Keyboard and no-JavaScript operation persist", "State is not color-only"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs", "tests/browser/desktop-acceptance.cjs"], "evidence": ["artifacts/evidence/desktop-full-today.png", "artifacts/evidence/desktop-offline-network-log.json"] },
+      "code_refs": ["src/FunHabitTracker/Views/Home/Today.cshtml", "src/FunHabitTracker/Controllers/HomeController.cs", "src/FunHabitTracker/wwwroot/css/site.css"]
+    },
+    {
+      "id": "USABILITY-004",
+      "statement": "Done and Skipped are reversible choices that toggle to Pending when selected while active and replace each other without duplicate rows.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Done toggles to Pending", "Skipped toggles to Pending", "Different outcome replaces active outcome", "Pending reset is idempotent"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/DailyTrackingServiceTests.cs", "tests/FunHabitTracker.Tests/CompactTodayTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"] },
+      "code_refs": ["src/FunHabitTracker/Services/DailyTrackingService.cs", "src/FunHabitTracker/Controllers/HomeController.cs", "src/FunHabitTracker/Views/Home/Compact.cshtml"]
+    },
+    {
+      "id": "USABILITY-005",
+      "statement": "Habit history provides a direct, keyboard-accessible Back to Today action that remains usable at constrained widths.",
+      "risk": "low",
+      "status": "resolved",
+      "acceptance": ["Back opens full Today directly", "Back and Edit remain visible", "Narrow history has no horizontal overflow"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs", "tests/browser/desktop-acceptance.cjs"], "evidence": ["artifacts/evidence/habit-history-desktop.png", "artifacts/evidence/habit-history-narrow.png"] },
+      "code_refs": ["src/FunHabitTracker/Views/Habits/History.cshtml", "src/FunHabitTracker/wwwroot/css/site.css"]
+    },
+    {
+      "id": "USABILITY-006",
+      "statement": "Full navigation identifies exactly one current Today, Habits, or Data section semantically and visually without relying on color alone.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Exactly one navigation item has aria-current", "Habit child pages remain associated with Habits", "Forced-colors and narrow layouts retain the indicator without overflow"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/ApplicationSmokeTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs", "tests/browser/desktop-acceptance.cjs"], "evidence": ["artifacts/evidence/desktop-navigation-narrow.png"] },
+      "code_refs": ["src/FunHabitTracker/Views/Shared/_Layout.cshtml", "src/FunHabitTracker/wwwroot/css/site.css"]
+    },
+    {
+      "id": "USABILITY-007",
+      "statement": "Compact and full desktop surfaces are mutually exclusive, refresh persisted state when activated, and retain local no-JavaScript browser fallback links.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Compact-to-full hides compact", "Full-to-compact hides full", "Repeated activation retains one owner and one visible surface", "Destination state is refreshed", "Browser fallback remains local and no-JavaScript"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopLifecycleTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs", "tests/browser/desktop-acceptance.cjs", "tests/windows/desktop-window-acceptance.ps1"], "evidence": ["artifacts/evidence/desktop-window-acceptance.md", "artifacts/evidence/desktop-offline-network-log.json"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/DesktopCoordinator.cs", "src/FunHabitTracker.Desktop/DesktopBrowserWindow.cs", "src/FunHabitTracker/Views/Shared/_Layout.cshtml", "src/FunHabitTracker/Views/Home/Compact.cshtml"]
+    }
+  ]
+}

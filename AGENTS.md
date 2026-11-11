@@ -6,8 +6,9 @@ FunHabitTracker is a small ASP.NET Core MVC application for tracking daily habit
 
 ## Stack
 
-- .NET 6
+- .NET 8 LTS (SDK 8.0.204 pinned in `global.json`)
 - ASP.NET Core MVC with Razor views
+- WPF, Windows Forms `NotifyIcon`, and WebView2 for the Windows shell
 - Entity Framework Core
 - SQLite for local app data
 - MSTest with EF Core InMemory for service tests
@@ -15,13 +16,18 @@ FunHabitTracker is a small ASP.NET Core MVC application for tracking daily habit
 ## Project Layout
 
 - `FunHabitTracker.sln` - solution file.
-- `src/FunHabitTracker/Program.cs` - app startup, dependency injection, routing, SQLite setup, and Data Protection key storage.
+- `src/FunHabitTracker/Program.cs` - browser fallback entry point.
+- `src/FunHabitTracker/Infrastructure/HabitTrackerWebApplication.cs` - reusable loopback host composition, startup, migrations, and shutdown.
+- `src/FunHabitTracker.Desktop/` - Windows shell, tray lifecycle, embedded browser, activation protocol, desktop settings, and diagnostics.
 - `src/FunHabitTracker/Data/AppDbContext.cs` - EF Core context and model configuration.
-- `src/FunHabitTracker/Models/` - `Habit` and `HabitCompletion` entities.
+- `src/FunHabitTracker/Infrastructure/` - local calendar, stable data paths, and database initialization.
+- `src/FunHabitTracker/Models/` - habit, recurrence, completion, and outcome entities.
 - `src/FunHabitTracker/Controllers/HomeController.cs` - today's habit dashboard, completion toggling, and quick habit creation.
 - `src/FunHabitTracker/Controllers/HabitsController.cs` - habit list and create form.
 - `src/FunHabitTracker/Views/` - Razor pages for the dashboard and habit CRUD screens.
-- `tests/FunHabitTracker.Tests/` - MSTest coverage for `HabitService`.
+- `tests/FunHabitTracker.Tests/` - MSTest unit, real-SQLite, migration, application, backup, and offline journey coverage.
+- `tests/FunHabitTracker.Desktop.Tests/` - desktop activation, navigation, settings, failure, and lifecycle coverage.
+- `tests/browser/desktop-acceptance.cjs` - keyboard, responsive, high-contrast, screenshot, and loopback-only browser acceptance.
 
 ## Local Commands
 
@@ -31,6 +37,7 @@ Run from the repository root:
 dotnet restore
 dotnet test
 dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
+dotnet run --project src\FunHabitTracker.Desktop\FunHabitTracker.Desktop.csproj
 ```
 
 To bind to a predictable local URL:
@@ -42,27 +49,30 @@ dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
 
 ## Runtime Data
 
-The app uses SQLite with `Data Source=habits.db`. Because the working directory can differ by launch method, the database is created relative to the process working directory. Local database files are ignored by Git.
+The app stores SQLite data under `%LOCALAPPDATA%\FunHabitTracker` by default. Override it with `FunHabitTracker__DataDirectory` or `FUNHABITTRACKER_DATA_DIR` for isolated development and tests. Local database files are ignored by Git.
 
-ASP.NET Data Protection keys are stored under `src/FunHabitTracker/.aspnet-data-protection-keys/` so the app can run in restricted users or sandboxes that cannot access the Windows profile key-ring path. This directory is runtime-only and ignored by Git.
+On first startup with an empty default database, the initializer imports a populated legacy `habits.db` from the application content root or working directory and leaves the source untouched. Custom data directories do not perform this discovery unless `FunHabitTracker__ImportLegacyDatabaseLocation=true` is explicitly set.
+
+ASP.NET Data Protection keys, backups, import staging, and startup logs live under the same stable per-user data root. These directories are runtime-only and ignored by Git.
 
 ## Domain Notes
 
-- `Habit` is the main tracked item. It has `Name`, optional `Description`, `Frequency`, `IsActive`, and `CreatedAt`.
-- `HabitCompletion` records one date-specific state for a habit.
+- `Habit` is the main tracked item. New behavior uses `StartDate`, `RecurrenceType`, `ScheduledDays`, and archive state; `Frequency` and `IsActive` remain only for legacy database compatibility.
+- `HabitCompletion` records one date-specific `Done` or `Skipped` outcome; absence means Pending.
 - `AppDbContext` enforces a unique index on `(HabitId, Date)`, so there should be at most one completion row per habit per day.
-- `HomeController.Today` shows active habits and joins each habit with today's completion row.
-- `HomeController.ToggleToday` creates a completion row if missing, otherwise flips `IsDone`.
+- `DailyTrackingService` evaluates due habits, outcomes, history, summaries, and streaks.
+- `HabitService` owns validated create, edit, archive, and restore behavior.
+- `BackupService` owns versioned JSON and consistent SQLite backup/restore.
 
 ## Test Notes
 
-Current tests cover `HabitService` CRUD behavior with EF Core InMemory. Controller actions and Razor rendering are not covered yet. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
+Tests include pure recurrence/streak rules, real SQLite constraints and migration adoption, Razor route smoke coverage, no-JavaScript core journeys, backup validation, and installer smoke evidence. Keep relational behavior on SQLite tests rather than relying only on EF InMemory.
 
 ## Known Constraints
 
-- The README describes planned features such as charts, reminders, rewards, and achievements. The current implemented surface is smaller: daily tracking, habit creation, listing, and done toggling.
-- `Program.cs` currently calls `EnsureCreated()` for local convenience. If introducing migrations-based deployments, replace this with an explicit migration strategy.
-- The app targets `net6.0`. Build machines need a compatible .NET SDK/runtime installed.
+- Cloud sync, accounts, native mobile packaging, reminders, rewards, and achievements remain outside the current release.
+- The desktop owner uses a random loopback port, an embedded WebView2 window, and a tray icon. Browser mode remains a supported fallback. Neither mode may bind to a non-loopback interface.
+- Import replaces the complete local dataset after validation and an automatic safety backup; merge semantics are not supported.
 
 ## Factory Workflow
 
@@ -116,3 +126,17 @@ npm run factory:all
 
 The authoritative gate policy is `quality-policy.yaml`. `ci/factory.py` must call
 the real project toolchain rather than substituting placeholder checks.
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in GitHub under `Robert-Programme/FunHabitTracker`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five canonical triage roles use their default label names. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+The project uses a single-context layout with `GLOSSARY.md` at the repository root and ADRs under `docs/adr/`. See `docs/agents/domain.md`.

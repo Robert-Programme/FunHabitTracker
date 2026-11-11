@@ -1,59 +1,56 @@
-using System.IO;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using FunHabitTracker.Data;
-using FunHabitTracker.Services;
+using FunHabitTracker.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile(Path.Combine(AppContext.BaseDirectory, "appsettings.json"), optional: true)
+    .AddCommandLine(args)
+    .AddEnvironmentVariables()
+    .Build();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
+var desktopMode = configuration.GetValue<bool>("FunHabitTracker:DesktopMode");
+var openDesktopBrowser = configuration.GetValue("FunHabitTracker:OpenBrowser", true);
+Mutex? desktopMutex = null;
+string? desktopUrl = null;
 
-// Add services to the container
-builder.Services.AddControllersWithViews();
-var dataProtectionKeysPath = Path.Combine(builder.Environment.ContentRootPath, ".aspnet-data-protection-keys");
-Directory.CreateDirectory(dataProtectionKeysPath);
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=habits.db"));
-builder.Services.AddScoped<HabitService>();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline
-// Ensure the database is created so DbSet properties are available to services/views
-using (var scope = app.Services.CreateScope())
+if (desktopMode)
 {
+    desktopMutex = new Mutex(initiallyOwned: true, "Local\\FunHabitTracker.Desktop", out var ownsMutex);
+    var paths = new AppPaths(configuration);
+    paths.EnsureCreated();
+    var endpointFile = Path.Combine(paths.Root, "desktop-endpoint.txt");
+    if (!ownsMutex)
+    {
+        if (openDesktopBrowser && File.Exists(endpointFile))
+        {
+            BrowserLauncher.Open(await File.ReadAllTextAsync(endpointFile));
+        }
+        desktopMutex.Dispose();
+        return;
+    }
+    desktopUrl = LoopbackEndpoint.SelectAvailableUrl();
+}
+
+await using var runtime = await HabitTrackerWebApplication.CreateAsync(args, desktopUrl);
+
+if (desktopMode && desktopUrl is not null)
+{
+    var endpointFile = Path.Combine(runtime.Paths.Root, "desktop-endpoint.txt");
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.EnsureCreated();
+        await runtime.StartAsync();
+        await File.WriteAllTextAsync(endpointFile, desktopUrl);
+        if (openDesktopBrowser) BrowserLauncher.Open(desktopUrl);
+        await runtime.WaitForShutdownAsync();
     }
-    catch
+    finally
     {
-        // If DB creation fails here, continue so the app can start and surface a clearer error in logs
+        if (File.Exists(endpointFile)) File.Delete(endpointFile);
+        desktopMutex?.ReleaseMutex();
+        desktopMutex?.Dispose();
     }
 }
-
-if (!app.Environment.IsDevelopment())
+else
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    await runtime.RunAsync();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
+public partial class Program;

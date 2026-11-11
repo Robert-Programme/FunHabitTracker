@@ -1,46 +1,51 @@
 # Fun Habit Tracker
 
-Welcome to the Fun Habit Tracker! This application is designed to help you build and maintain positive habits in a fun and engaging way. Whether you're looking to exercise more, read daily, or drink enough water, this app will keep you motivated and on track!
+Fun Habit Tracker is a Windows-first, local-first habit application. Its core workflows
+run on a loopback-only ASP.NET Core host, keep data in SQLite, and do not require an
+internet connection.
 
 ## Features
 
-- **User-Friendly Interface**: Enjoy a clean and intuitive design that makes tracking your habits a breeze.
-- **Habit Management**: Easily add, update, and delete habits with just a few clicks.
-- **Progress Tracking**: Visualize your progress with fun charts and statistics.
-- **Reminders**: Set reminders to keep you accountable and motivated.
-- **Gamification**: Earn rewards and achievements as you reach your habit goals!
+- Today view with reversible Pending, Done, and Skipped states and a one-click completion marker.
+- Daily or selected-weekday schedules with a local start date.
+- Habit create, edit, archive, restore, history, completion summaries, and streaks.
+- Versioned JSON export/import with preview, confirmation, validation, and safety backup.
+- Consistent SQLite backup and validated restore.
+- Responsive server-rendered UI that keeps core actions functional without JavaScript.
+- Full-view navigation that clearly identifies the current Today, Habits, or Data section.
+- Compact Windows desktop window with taskbar-safe Minimize, close-to-tray, notification-area
+  access, exclusive compact/full switching, and optional start at sign in.
+- Self-contained `win-x64` publish with an offline WebView2 and PowerShell installer bundle.
 
-## Getting Started
+Cloud sync, accounts, mobile-native packaging, rewards, and reminders are not part of the
+current local-first release.
 
-To get started with the Fun Habit Tracker, follow these steps:
+## Requirements
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/FunHabitTracker.git
-   cd FunHabitTracker
-   ```
+- Development: .NET SDK `8.0.204`, pinned by `global.json`; Node.js/npm for OpenSpec and
+  Factory gates; Python 3 for the repository Factory runner.
+- Installed app: supported 64-bit Windows. The release bundle includes the .NET runtime.
 
-2. **Open the Project**:
-   Open the project in your preferred IDE.
+## Develop
 
-3. **Restore Dependencies**:
-   Run the following command to restore the necessary packages:
-   ```bash
-   dotnet restore
-   ```
+```powershell
+dotnet restore FunHabitTracker.sln
+dotnet test FunHabitTracker.sln
+$env:ASPNETCORE_URLS='http://127.0.0.1:5016'
+dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
+dotnet run --project src\FunHabitTracker.Desktop\FunHabitTracker.Desktop.csproj
+```
 
-4. **Run the Application**:
-   Start the application using:
-   ```bash
-   dotnet run
-   ```
+Use an isolated data directory when developing or testing manually:
 
-5. **Access the App**:
-   Open your web browser and navigate to `http://localhost:5000` to start tracking your habits!
+```powershell
+$env:FunHabitTracker__DataDirectory="$PWD\.tmp\local-data"
+```
 
-## Factory Workflow
+The default data root is `%LOCALAPPDATA%\FunHabitTracker`. See
+`docs/backup-restore.md` before moving or restoring database files.
 
-Material changes use OpenSpec and repository-local verification gates:
+## Verify
 
 ```powershell
 npm ci
@@ -48,17 +53,22 @@ npm run openspec:validate
 npm run factory:all
 ```
 
-See `docs/factory-process.md` and `AGENTS.md` for the change lifecycle,
-requirements, evidence, and Definition of Done.
+Material changes follow `AGENTS.md`, `docs/factory-process.md`, and the OpenSpec artifacts
+under `openspec/`.
 
-## Contributing
+## Package
 
-We welcome contributions! If you'd like to help improve the Fun Habit Tracker, please fork the repository and submit a pull request.
+```powershell
+.\installer\package.ps1
+.\installer\verify.ps1
+```
 
-## License
+The versioned static publishing bundle, ZIP, manifest, checksum, SBOM, provenance, trust
+notice, and user documents are written under `artifacts/website/`. Installation and
+uninstall behavior are documented in `docs/installation.md`.
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Data safety
 
-## Acknowledgments
-
-Thanks to everyone who contributed to this project and to the open-source community for their support! Let's make habit tracking fun together!
+Backups contain personal habit descriptions and history. They are processed locally and
+are never uploaded by the application. Normal uninstall preserves user data unless
+`-RemoveData` is explicitly supplied.

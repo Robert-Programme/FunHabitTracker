@@ -1,95 +1,56 @@
-@model FunHabitTracker.ViewModels.TodayViewModel
+@model FunHabitTracker.ViewModels.TodayDashboardModel
+@using FunHabitTracker.Models
+@using FunHabitTracker.ViewModels
 @{
-    ViewData["Title"] = "Heute - Habit Tracker";
+    ViewData["Title"] = "Heute";
 }
 
-<div class="container mt-5">
-    <header>
-        <h1>Heute: @Model.Date.ToString("dddd, dd.MM.yyyy")</h1>
-        <p class="text-muted">Markiere deine Habits für heute als erledigt</p>
-    </header>
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">@Model.Date.ToString("dddd, dd. MMMM")</p>
+        <h1>Heute</h1>
+    </div>
+    <div class="completion-summary" aria-label="@Model.DoneCount von @Model.DueCount erledigt">
+        <strong>@Model.CompletionPercent%</strong>
+        <span>@Model.DoneCount von @Model.DueCount erledigt</span>
+    </div>
+</section>
 
-    <main>
-        <section class="today-habits mt-4">
-            @if (Model.Habits.Count == 0)
-            {
-                <div class="alert alert-info">
-                    <p>Du hast noch keine aktiven Habits. <a href="#add-habit">Erstelle dein erstes Habit!</a></p>
-                </div>
-            }
-            else
-            {
-                <div class="list-group">
-                    @foreach (var habit in Model.Habits)
-                    {
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <div class="form-check">
-                                        <form asp-action="ToggleToday" asp-route-habitId="@habit.HabitId" method="post" style="display: inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="checkbox" class="form-check-input" id="habit-@habit.HabitId" 
-                                                   @(habit.IsDoneToday ? "checked" : "") 
-                                                   onchange="this.form.submit()" />
-                                            <label class="form-check-label" for="habit-@habit.HabitId">
-                                                <strong>@habit.Name</strong>
-                                                @if (!string.IsNullOrEmpty(habit.Description))
-                                                {
-                                                    <br />
-                                                    <small class="text-muted">@habit.Description</small>
-                                                }
-                                            </label>
-                                        </form>
-                                    </div>
-                                </div>
-                                <span class="badge @(habit.IsDoneToday ? "bg-success" : "bg-secondary")">
-                                    @(habit.IsDoneToday ? "✓ Erledigt" : "Nicht erledigt")
-                                </span>
-                            </div>
-                        </div>
-                    }
-                </div>
-            }
-        </section>
+<div class="progress-track" aria-hidden="true"><span style="width: @Model.CompletionPercent%"></span></div>
 
-        <section id="add-habit" class="add-habit mt-5">
-            <h2>Neues Habit erstellen</h2>
-            <form asp-action="AddHabit" method="post" class="form-group">
-                @Html.AntiForgeryToken()
-                <div class="mb-3">
-                    <input type="text" name="name" placeholder="Habit Name" class="form-control" required />
+@if (Model.Habits.Count == 0)
+{
+    <section class="empty-state">
+        <h2>Heute ist frei</h2>
+        <p>Es sind keine aktiven Habits eingeplant.</p>
+        <a class="button button-primary" asp-controller="Habits" asp-action="Create">Habit anlegen</a>
+    </section>
+}
+else
+{
+    <section class="habit-list" aria-label="Habits fuer heute">
+        @foreach (var habit in Model.Habits)
+        {
+            var statusClass = habit.Status switch { TodayStatus.Done => "is-done", TodayStatus.Skipped => "is-skipped", _ => "is-pending" };
+            <article class="habit-row @statusClass">
+                <div class="habit-main">
+                    <form asp-action="SetOutcome" method="post" class="status-form">
+                        <input type="hidden" name="habitId" value="@habit.Id" />
+                        <input type="hidden" name="outcome" value="Done" />
+                        <button class="status-symbol" type="submit" aria-label="@(habit.Status == TodayStatus.Done ? $"{habit.Name} wieder als offen markieren" : $"{habit.Name} erledigen")" aria-pressed="@(habit.Status == TodayStatus.Done ? "true" : "false")">@(habit.Status == TodayStatus.Done ? "OK" : habit.Status == TodayStatus.Skipped ? "--" : "o")</button>
+                    </form>
+                    <div class="habit-copy">
+                        <h2><a asp-controller="Habits" asp-action="History" asp-route-id="@habit.Id">@habit.Name</a></h2>
+                        @if (!string.IsNullOrWhiteSpace(habit.Description)) { <p>@habit.Description</p> }
+                        <span class="habit-meta">@habit.CurrentStreak Tage Serie</span>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <input type="text" name="description" placeholder="Beschreibung (optional)" class="form-control" />
+                <div class="outcome-actions" aria-label="Status fuer @habit.Name">
+                    <form asp-action="SetOutcome" method="post"><input type="hidden" name="habitId" value="@habit.Id" /><input type="hidden" name="outcome" value="Done" /><button class="outcome-button done" type="submit" aria-pressed="@(habit.Status == TodayStatus.Done ? "true" : "false")">Erledigt</button></form>
+                    <form asp-action="SetOutcome" method="post"><input type="hidden" name="habitId" value="@habit.Id" /><input type="hidden" name="outcome" value="Skipped" /><button class="outcome-button skipped" type="submit" aria-pressed="@(habit.Status == TodayStatus.Skipped ? "true" : "false")">Ueberspringen</button></form>
+                    <form asp-action="ClearOutcome" method="post"><input type="hidden" name="habitId" value="@habit.Id" /><button class="outcome-button pending" type="submit" aria-pressed="@(habit.Status == TodayStatus.Pending ? "true" : "false")">Offen</button></form>
                 </div>
-                <div class="mb-3">
-                    <input type="text" name="frequency" placeholder="Häufigkeit (z.B. Täglich)" class="form-control" value="Täglich" />
-                </div>
-                <button type="submit" class="btn btn-primary">Habit erstellen</button>
-            </form>
-        </section>
-    </main>
-</div>
-
-<style>
-    .today-habits .list-group-item {
-        padding: 15px;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-    
-    .today-habits .form-check {
-        margin: 0;
-    }
-    
-    .today-habits .form-check-input {
-        cursor: pointer;
-        width: 1.25em;
-        height: 1.25em;
-    }
-    
-    .badge {
-        padding: 0.5em 0.75em;
-    }
-</style>
+            </article>
+        }
+    </section>
+}

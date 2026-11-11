@@ -1,28 +1,33 @@
-// site.js
-document.addEventListener('DOMContentLoaded', function() {
-    const habitForm = document.getElementById('habit-form');
-    const habitList = document.getElementById('habit-list');
-
-    habitForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const habitName = document.getElementById('habit-name').value;
-        const habitDescription = document.getElementById('habit-description').value;
-
-        if (habitName) {
-            addHabitToList(habitName, habitDescription);
-            habitForm.reset();
-        }
-    });
-
-    function addHabitToList(name, description) {
-        const listItem = document.createElement('li');
-        listItem.classList.add('habit-item');
-        listItem.innerHTML = `<strong>${name}</strong>: ${description} <button class="complete-btn">✔️</button>`;
-        
-        listItem.querySelector('.complete-btn').addEventListener('click', function() {
-            listItem.classList.toggle('completed');
-        });
-
-        habitList.appendChild(listItem);
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    const recurrence = document.querySelector('[data-recurrence]');
+    const weekdays = document.querySelector('[data-weekdays]');
+    if (!recurrence || !weekdays) return;
+    const update = () => { weekdays.hidden = recurrence.value !== 'SelectedWeekdays'; };
+    recurrence.addEventListener('change', update);
+    update();
 });
+
+const bindCompactForms = () => {
+    document.querySelectorAll('[data-compact-outcome]').forEach((form) => {
+        if (form.dataset.enhanced === 'true') return;
+        form.dataset.enhanced = 'true';
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = form.querySelector('button');
+            if (button) button.disabled = true;
+            try {
+                const response = await fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin' });
+                if (!response.ok) throw new Error('Outcome update failed');
+                const next = new DOMParser().parseFromString(await response.text(), 'text/html').querySelector('.compact-shell');
+                const current = document.querySelector('.compact-shell');
+                if (!next || !current) throw new Error('Compact response is invalid');
+                current.replaceWith(next);
+                bindCompactForms();
+            } catch {
+                form.submit();
+            }
+        });
+    });
+};
+
+document.addEventListener('DOMContentLoaded', bindCompactForms);

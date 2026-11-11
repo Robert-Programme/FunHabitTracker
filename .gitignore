@@ -33,9 +33,16 @@ __pycache__/
 reports/*.sarif
 artifacts/*.json
 artifacts/*.jsonl
+artifacts/installer/
+artifacts/*.zip
+artifacts/*.zip.sha256
+artifacts/website/
+installer/runtime/*.exe
 .codex-log/
+.ai/
 
 ## Misc
 *.DS_Store
 *.class
 bin-debug/
+.tmp/
