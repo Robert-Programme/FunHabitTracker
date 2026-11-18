@@ -56,7 +56,9 @@ ASP.NET Data Protection keys are stored under `src/FunHabitTracker/.aspnet-data-
 
 ## Test Notes
 
-Current tests cover `HabitService` CRUD behavior with EF Core InMemory. Controller actions and Razor rendering are not covered yet. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
+Service tests cover `HabitService` CRUD behavior with EF Core InMemory. `CreateHabitIntegrationTests` uses WebApplicationFactory and an isolated SQLite in-memory database to cover the create form, validation, persistence, antiforgery, and local validation scripts in Development and Production. These tests run with the normal `dotnet test` command.
+
+Pinned browser validation libraries, upstream licenses, source URLs, and checksums are under `src/FunHabitTracker/wwwroot/lib/`. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
 
 ## Known Constraints
 
