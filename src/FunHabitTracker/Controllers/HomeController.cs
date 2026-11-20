@@ -59,6 +59,11 @@ namespace FunHabitTracker.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ToggleToday(int habitId)
         {
+            if (!_context.Habits.Any(h => h.Id == habitId && h.IsActive))
+            {
+                return NotFound();
+            }
+
             var today = DateOnly.FromDateTime(DateTime.Today);
             
             var completion = _context.HabitCompletions
