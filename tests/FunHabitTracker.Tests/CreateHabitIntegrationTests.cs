@@ -182,9 +182,9 @@ public class CreateHabitIntegrationTests
         var html = await browser.GetStringAsync("/Habits/Create");
         var previous = -1;
         foreach (var path in new[] {
-            "/lib/jquery/dist/jquery.min.js",
-            "/lib/jquery-validation/dist/jquery.validate.min.js",
-            "/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js" })
+            "/vendor/jquery/jquery.min.js",
+            "/vendor/jquery-validation/jquery.validate.min.js",
+            "/vendor/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" })
         {
             var response = await browser.GetAsync(path);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, path);

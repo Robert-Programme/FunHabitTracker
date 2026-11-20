@@ -1,6 +1,7 @@
 # Third-party validation scripts
 
-These browser distributions are served locally in all environments.
+These intentionally vendored runtime assets are served locally in all environments.
+They are not application build outputs. The vendor directory distinguishes them from generated dist directories.
 Upstream contents are preserved with line endings normalized to LF.
 Load order: jQuery, jQuery Validation, jQuery Unobtrusive Validation.
 Each package retains its upstream license alongside the distribution.

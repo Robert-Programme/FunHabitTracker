@@ -37,7 +37,7 @@ dotnet list FunHabitTracker.sln package --vulnerable --include-transitive
 
 Tests include SQLite-backed HTTP/controller regressions, an EF Core 6 schema compatibility fixture, startup failure checks, and a shared-script regression. CI also runs CodeQL and a history secret scan. See `.github/workflows/portfolio-quality.yml` for the commit-bound checks.
 
-The browser validation libraries are served locally. Their versions, source URLs, checksums, and upstream licenses are in `src/FunHabitTracker/wwwroot/lib/`.
+The browser validation libraries are served locally. Their versions, source URLs, checksums, and upstream licenses are in `src/FunHabitTracker/wwwroot/vendor/`.
 
 ## License
 
