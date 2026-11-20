@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using FunHabitTracker.Controllers;
 using FunHabitTracker.Data;
 using FunHabitTracker.Models;
@@ -15,6 +17,7 @@ namespace FunHabitTracker.Tests;
 [TestClass]
 public class HomeControllerTests
 {
+    private readonly List<string> commands = new();
     private SqliteConnection connection;
     private AppDbContext db;
     private HomeController controller;
@@ -24,7 +27,7 @@ public class HomeControllerTests
     {
         connection = new SqliteConnection("Data Source=:memory:");
         connection.Open();
-        db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(connection).Options);
+        db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(connection).LogTo(commands.Add, LogLevel.Information).Options);
         db.Database.EnsureCreated();
         controller = new HomeController(new HabitService(db), db);
     }
@@ -89,5 +92,40 @@ public class HomeControllerTests
         controller.ToggleToday(7);
         Assert.AreEqual(2, db.HabitCompletions.Count());
         Assert.IsTrue(db.HabitCompletions.Single(c => c.Date == new DateOnly(2000, 1, 1)).IsDone);
+    }
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(10)]
+    public void Today_QueryCountIsBounded(int count)
+    {
+        for (var i = 0; i < count; i++) db.Habits.Add(new Habit { Name = "Habit " + i });
+        db.Habits.Add(new Habit { Name = "Archived", IsActive = false });
+        db.SaveChanges();
+        commands.Clear();
+        var model = (TodayViewModel)((ViewResult)controller.Today()).Model;
+        Assert.AreEqual(count, model.Habits.Count);
+        var queries = commands.Count(c => c.Contains("Executed DbCommand"));
+        Assert.IsTrue(queries <= 2, "Expected at most two SQL commands, actual: " + queries);
+    }
+    [TestMethod]
+    public void Today_ProjectsOnlyActiveHabitsAndTodaysState()
+    {
+        var done = new Habit { Name = "Done", Description = "Details" };
+        var pending = new Habit { Name = "Pending" };
+        var archived = new Habit { Name = "Archived", IsActive = false };
+        db.Habits.AddRange(done, pending, archived); db.SaveChanges();
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        db.HabitCompletions.AddRange(
+            new HabitCompletion { HabitId = done.Id, Date = today, IsDone = true },
+            new HabitCompletion { HabitId = pending.Id, Date = today.AddDays(-1), IsDone = true },
+            new HabitCompletion { HabitId = archived.Id, Date = today, IsDone = true });
+        db.SaveChanges();
+        var model = (TodayViewModel)((ViewResult)controller.Today()).Model;
+        Assert.AreEqual(2, model.Habits.Count);
+        Assert.AreEqual(today, model.Date);
+        Assert.IsTrue(model.Habits.Single(h => h.HabitId == done.Id).IsDoneToday);
+        Assert.AreEqual("Details", model.Habits.Single(h => h.HabitId == done.Id).Description);
+        Assert.IsFalse(model.Habits.Single(h => h.HabitId == pending.Id).IsDoneToday);
     }
 }
