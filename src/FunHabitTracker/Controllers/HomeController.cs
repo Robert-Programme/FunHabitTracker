@@ -28,7 +28,7 @@ namespace FunHabitTracker.Controllers
         public IActionResult Today()
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
-            
+
             var habits = (
                 from habit in _context.Habits
                 where habit.IsActive
@@ -58,7 +58,7 @@ namespace FunHabitTracker.Controllers
             }
 
             var today = DateOnly.FromDateTime(DateTime.Today);
-            
+
             var completion = _context.HabitCompletions
                 .FirstOrDefault(hc => hc.HabitId == habitId && hc.Date == today);
 

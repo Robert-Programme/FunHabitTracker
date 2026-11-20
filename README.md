@@ -1,55 +1,44 @@
 # Fun Habit Tracker
 
-Welcome to the Fun Habit Tracker! This application is designed to help you build and maintain positive habits in a fun and engaging way. Whether you're looking to exercise more, read daily, or drink enough water, this app will keep you motivated and on track!
+A small single-user ASP.NET Core MVC app for tracking daily habits with SQLite.
 
-## Features
+## Implemented features
 
-- **User-Friendly Interface**: Enjoy a clean and intuitive design that makes tracking your habits a breeze.
-- **Habit Management**: Easily add, update, and delete habits with just a few clicks.
-- **Progress Tracking**: Visualize your progress with fun charts and statistics.
-- **Reminders**: Set reminders to keep you accountable and motivated.
-- **Gamification**: Earn rewards and achievements as you reach your habit goals!
+- Create habits with an optional description and active status.
+- List all habits and show active habits on today's dashboard.
+- Mark habits done or undone for the current day, preserving earlier completion records.
+- Validate names and default an empty frequency to Daily.
 
-## Runtime
+Charts, reminders, achievements, and weekly scheduling are not implemented.
 
-Requires the .NET 10 SDK pinned in `global.json`. The application uses EF Core 10 with SQLite.
+## Run locally
 
-## Getting Started
+Install the .NET 10 SDK pinned in `global.json`. Node.js 20+ is needed only for the JavaScript test.
 
-To get started with the Fun Habit Tracker, follow these steps:
+```sh
+git clone https://github.com/Robert-Programme/FunHabitTracker.git
+cd FunHabitTracker
+dotnet restore
+dotnet run --project src/FunHabitTracker --urls http://localhost:5016
+```
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/FunHabitTracker.git
-   cd FunHabitTracker
-   ```
+Open http://localhost:5016/Home/Today. No account or login is required; the current app has a shared single-user data model.
 
-2. **Open the Project**:
-   Open the project in your preferred IDE.
+SQLite is created as `habits.db` relative to the process working directory. Startup fails if that path cannot be initialized. Data Protection keys are persisted under the app content root in `.aspnet-data-protection-keys/`. These runtime files are ignored by Git. `EnsureCreated` initializes new databases; existing-schema upgrades require a separate migration strategy.
 
-3. **Restore Dependencies**:
-   Run the following command to restore the necessary packages:
-   ```bash
-   dotnet restore
-   ```
+## Verify
 
-4. **Run the Application**:
-   Start the application using:
-   ```bash
-   dotnet run
-   ```
+```sh
+dotnet test --configuration Release
+node --test tests/js/site.test.cjs
+dotnet format FunHabitTracker.sln --verify-no-changes --no-restore
+dotnet list FunHabitTracker.sln package --vulnerable --include-transitive
+```
 
-5. **Access the App**:
-   Open your web browser and navigate to `http://localhost:5000` to start tracking your habits!
+Tests include SQLite-backed HTTP/controller regressions, an EF Core 6 schema compatibility fixture, startup failure checks, and a shared-script regression. CI also runs CodeQL and a history secret scan. See `.github/workflows/portfolio-quality.yml` for the commit-bound checks.
 
-## Contributing
-
-We welcome contributions! If you'd like to help improve the Fun Habit Tracker, please fork the repository and submit a pull request.
+The browser validation libraries are served locally. Their versions, source URLs, checksums, and upstream licenses are in `src/FunHabitTracker/wwwroot/lib/`.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Acknowledgments
-
-Thanks to everyone who contributed to this project and to the open-source community for their support! Let's make habit tracking fun together!
+A project license has not yet been selected. Upstream library licenses are retained with the third-party assets.

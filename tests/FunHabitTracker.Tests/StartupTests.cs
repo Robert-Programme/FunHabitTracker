@@ -23,7 +23,7 @@ public class StartupTests
         try
         {
             using var application = new BrokenDatabaseApplication(directory);
-            Assert.ThrowsException<SqliteException>(() =>
+            Assert.ThrowsExactly<SqliteException>(() =>
             {
                 using var client = application.CreateClient();
             });

@@ -129,7 +129,8 @@ public class CreateHabitIntegrationTests
         var html = await client.GetStringAsync("/Home/Today");
         var token = Regex.Match(html, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
         Assert.IsTrue(token.Success);
-        var values = new Dictionary<string, string> {
+        var values = new Dictionary<string, string>
+        {
             ["name"] = name,
             ["__RequestVerificationToken"] = WebUtility.HtmlDecode(token.Groups[1].Value)
         };
