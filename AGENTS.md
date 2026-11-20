@@ -6,7 +6,7 @@ FunHabitTracker is a small ASP.NET Core MVC application for tracking daily habit
 
 ## Stack
 
-- .NET 6
+- .NET 10 LTS
 - ASP.NET Core MVC with Razor views
 - Entity Framework Core
 - SQLite for local app data
@@ -64,4 +64,4 @@ Pinned browser validation libraries, upstream licenses, source URLs, and checksu
 
 - The README describes planned features such as charts, reminders, rewards, and achievements. The current implemented surface is smaller: daily tracking, habit creation, listing, and done toggling.
 - `Program.cs` currently calls `EnsureCreated()` for local convenience. If introducing migrations-based deployments, replace this with an explicit migration strategy.
-- The app targets `net6.0`. Build machines need a compatible .NET SDK/runtime installed.
+- The app targets `net10.0`. Build machines need the .NET 10 SDK pinned in `global.json` and a compatible runtime.

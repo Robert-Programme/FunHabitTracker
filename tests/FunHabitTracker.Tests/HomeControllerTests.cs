@@ -32,7 +32,7 @@ public class HomeControllerTests
     [TestCleanup]
     public void Cleanup() { db.Dispose(); connection.Dispose(); }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(false)]
     [DataRow(true)]
     public void Toggle_UnknownOrInactiveHabit_RejectsWithoutWriting(bool inactiveExists)
@@ -72,5 +72,22 @@ public class HomeControllerTests
         db.Habits.Remove(habit); db.SaveChanges();
         Assert.IsInstanceOfType(controller.ToggleToday(id), typeof(NotFoundResult));
         Assert.AreEqual(0, db.HabitCompletions.Count());
+    }
+    [TestMethod]
+    public void ExistingEf6Database_RetainsDataAndAcceptsNewCompletions()
+    {
+        // Schema exported with EF Core 6.0.0 from the reviewed AppDbContext.
+        db.Database.EnsureDeleted();
+        using var stream = typeof(HomeControllerTests).Assembly.GetManifestResourceStream("FunHabitTracker.Tests.Fixtures.Schema6.sql");
+        using var reader = new System.IO.StreamReader(stream);
+        db.Database.ExecuteSqlRaw(reader.ReadToEnd());
+        db.Database.ExecuteSqlRaw("INSERT INTO Habits (Id, Name, Frequency, IsActive, CreatedAt) VALUES (7, 'Legacy', 'Daily', 1, '2000-01-01 00:00:00')");
+        db.Database.ExecuteSqlRaw("INSERT INTO HabitCompletions (HabitId, Date, IsDone) VALUES (7, '2000-01-01', 1)");
+        Assert.IsFalse(db.Database.EnsureCreated());
+        Assert.AreEqual("Legacy", db.Habits.Single().Name);
+        Assert.AreEqual(new DateOnly(2000, 1, 1), db.HabitCompletions.Single().Date);
+        controller.ToggleToday(7);
+        Assert.AreEqual(2, db.HabitCompletions.Count());
+        Assert.IsTrue(db.HabitCompletions.Single(c => c.Date == new DateOnly(2000, 1, 1)).IsDone);
     }
 }

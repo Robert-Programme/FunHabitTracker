@@ -10,6 +10,10 @@ Welcome to the Fun Habit Tracker! This application is designed to help you build
 - **Reminders**: Set reminders to keep you accountable and motivated.
 - **Gamification**: Earn rewards and achievements as you reach your habit goals!
 
+## Runtime
+
+Requires the .NET 10 SDK pinned in `global.json`. The application uses EF Core 10 with SQLite.
+
 ## Getting Started
 
 To get started with the Fun Habit Tracker, follow these steps:
