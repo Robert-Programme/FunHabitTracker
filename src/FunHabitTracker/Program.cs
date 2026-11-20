@@ -35,9 +35,10 @@ using (var scope = app.Services.CreateScope())
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         db.Database.EnsureCreated();
     }
-    catch
+    catch (System.Exception exception)
     {
-        // If DB creation fails here, continue so the app can start and surface a clearer error in logs
+        app.Logger.LogCritical(exception, "SQLite database initialization failed; application startup aborted.");
+        throw;
     }
 }
 
