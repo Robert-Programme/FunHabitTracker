@@ -30,3 +30,7 @@ habits.db
 *.DS_Store
 *.class
 bin-debug/
+
+# Python quality-check caches
+__pycache__/
+*.pyc

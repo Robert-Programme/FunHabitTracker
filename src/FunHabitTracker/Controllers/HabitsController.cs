@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FunHabitTracker.Data;
 using FunHabitTracker.Models;
+using FunHabitTracker.InputModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,7 @@ public class HabitsController : Controller
     /// </summary>
     public IActionResult Create()
     {
-        return View();
+        return View(new CreateHabitInput());
     }
 
     /// <summary>
@@ -46,14 +47,14 @@ public class HabitsController : Controller
     /// </summary>
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Name,Description,IsActive")] Habit habit)
+    public async Task<IActionResult> Create(CreateHabitInput input)
     {
         if (!ModelState.IsValid)
         {
-            return View(habit);
+            return View(input);
         }
 
-        habit.CreatedAt = DateTime.Now;
+        var habit = input.ToHabit();
         _context.Habits.Add(habit);
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));

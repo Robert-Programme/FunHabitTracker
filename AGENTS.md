@@ -6,7 +6,7 @@ FunHabitTracker is a small ASP.NET Core MVC application for tracking daily habit
 
 ## Stack
 
-- .NET 6
+- .NET 10 LTS
 - ASP.NET Core MVC with Razor views
 - Entity Framework Core
 - SQLite for local app data
@@ -30,6 +30,7 @@ Run from the repository root:
 ```powershell
 dotnet restore
 dotnet test
+node --test tests/js/site.test.cjs
 dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
 ```
 
@@ -56,10 +57,12 @@ ASP.NET Data Protection keys are stored under `src/FunHabitTracker/.aspnet-data-
 
 ## Test Notes
 
-Current tests cover `HabitService` CRUD behavior with EF Core InMemory. Controller actions and Razor rendering are not covered yet. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
+Service tests cover `HabitService` CRUD behavior with EF Core InMemory. `CreateHabitIntegrationTests` uses WebApplicationFactory and an isolated SQLite in-memory database to cover the create form, validation, persistence, antiforgery, and local validation scripts in Development and Production. These tests run with the normal `dotnet test` command. The JavaScript regression uses Node.js 20+ and the built-in test runner; no npm install is needed.
+
+Pinned browser validation libraries, upstream licenses, source URLs, and checksums are under `src/FunHabitTracker/wwwroot/lib/`. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
 
 ## Known Constraints
 
 - The README describes planned features such as charts, reminders, rewards, and achievements. The current implemented surface is smaller: daily tracking, habit creation, listing, and done toggling.
 - `Program.cs` currently calls `EnsureCreated()` for local convenience. If introducing migrations-based deployments, replace this with an explicit migration strategy.
-- The app targets `net6.0`. Build machines need a compatible .NET SDK/runtime installed.
+- The app targets `net10.0`. Build machines need the .NET 10 SDK pinned in `global.json` and a compatible runtime.

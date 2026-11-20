@@ -5,6 +5,7 @@ using FunHabitTracker.Services;
 using FunHabitTracker.ViewModels;
 using FunHabitTracker.Models;
 using FunHabitTracker.Data;
+using FunHabitTracker.InputModels;
 
 namespace FunHabitTracker.Controllers
 {
@@ -28,28 +29,21 @@ namespace FunHabitTracker.Controllers
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
 
-            // Get all active habits
-            var activeHabits = _context.Habits
-                .Where(h => h.IsActive)
-                .ToList();
-
-            var viewModel = new TodayViewModel
-            {
-                Date = today,
-                Habits = activeHabits.Select(habit =>
+            var habits = (
+                from habit in _context.Habits
+                where habit.IsActive
+                join completion in _context.HabitCompletions.Where(c => c.Date == today)
+                    on habit.Id equals completion.HabitId into dailyCompletions
+                from completion in dailyCompletions.DefaultIfEmpty()
+                select new TodayHabitViewModel
                 {
-                    var completion = _context.HabitCompletions
-                        .FirstOrDefault(hc => hc.HabitId == habit.Id && hc.Date == today);
+                    HabitId = habit.Id,
+                    Name = habit.Name,
+                    Description = habit.Description,
+                    IsDoneToday = completion != null && completion.IsDone
+                }).ToList();
 
-                    return new TodayHabitViewModel
-                    {
-                        HabitId = habit.Id,
-                        Name = habit.Name,
-                        Description = habit.Description,
-                        IsDoneToday = completion?.IsDone ?? false
-                    };
-                }).ToList()
-            };
+            var viewModel = new TodayViewModel { Date = today, Habits = habits };
 
             return View(viewModel);
         }
@@ -58,6 +52,11 @@ namespace FunHabitTracker.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ToggleToday(int habitId)
         {
+            if (!_context.Habits.Any(h => h.Id == habitId && h.IsActive))
+            {
+                return NotFound();
+            }
+
             var today = DateOnly.FromDateTime(DateTime.Today);
 
             var completion = _context.HabitCompletions
@@ -88,19 +87,10 @@ namespace FunHabitTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddHabit(string name, string description, string frequency)
+        public IActionResult AddHabit(CreateHabitInput input)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return BadRequest("Name is required");
-            }
-
-            var habit = new Habit
-            {
-                Name = name,
-                Description = description,
-                Frequency = frequency
-            };
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var habit = input.ToHabit();
 
             _habitService.AddHabit(habit);
 

@@ -1,50 +1,44 @@
 # Fun Habit Tracker
 
-Fun Habit Tracker is a small ASP.NET Core MVC application for maintaining habits and
-recording whether each active habit was completed today. It stores local data in SQLite
-and renders the interface with Razor views.
+A small single-user ASP.NET Core MVC app for tracking daily habits with SQLite.
 
-## Implemented Features
+## Implemented features
 
-- Create habits with a name, description, and frequency.
-- List configured habits.
-- View active habits for the current day.
-- Toggle today's completion state for each active habit.
-- Persist local habit and completion data in SQLite.
+- Create habits with an optional description and active status.
+- List all habits and show active habits on today's dashboard.
+- Mark habits done or undone for the current day, preserving earlier completion records.
+- Validate names and default an empty frequency to Daily.
 
-## Requirements
+Charts, reminders, achievements, and weekly scheduling are not implemented.
 
-- .NET 6 SDK
+## Run locally
 
-## Run Locally
+Install the .NET 10 SDK pinned in `global.json`. Node.js 20+ is needed only for the JavaScript test.
 
-```bash
+```sh
 git clone https://github.com/Robert-Programme/FunHabitTracker.git
 cd FunHabitTracker
 dotnet restore
-dotnet run --project src/FunHabitTracker/FunHabitTracker.csproj --urls http://localhost:5016
+dotnet run --project src/FunHabitTracker --urls http://localhost:5016
 ```
 
-Open `http://localhost:5016/Today` in a browser. The application creates its local
-SQLite database on first start.
+Open http://localhost:5016/Home/Today. No account or login is required; the current app has a shared single-user data model.
 
-## Tests
+SQLite is created as `habits.db` relative to the process working directory. Startup fails if that path cannot be initialized. Data Protection keys are persisted under the app content root in `.aspnet-data-protection-keys/`. These runtime files are ignored by Git. `EnsureCreated` initializes new databases; existing-schema upgrades require a separate migration strategy.
 
-```bash
-dotnet test FunHabitTracker.sln
+## Verify
+
+```sh
+dotnet test --configuration Release
+node --test tests/js/site.test.cjs
+dotnet format FunHabitTracker.sln --verify-no-changes --no-restore
+dotnet list FunHabitTracker.sln package --vulnerable --include-transitive
 ```
 
-The current MSTest suite covers the `HabitService` CRUD behavior with an in-memory
-Entity Framework Core database.
+Tests include SQLite-backed HTTP/controller regressions, an EF Core 6 schema compatibility fixture, startup failure checks, and a shared-script regression. CI also runs CodeQL and a history secret scan. See `.github/workflows/portfolio-quality.yml` for the commit-bound checks.
 
-## Project Structure
+The browser validation libraries are served locally. Their versions, source URLs, checksums, and upstream licenses are in `src/FunHabitTracker/wwwroot/lib/`.
 
-- `src/FunHabitTracker/` contains the ASP.NET Core MVC application.
-- `tests/FunHabitTracker.Tests/` contains the MSTest project.
-- `FunHabitTracker.sln` is the solution entry point for build and test commands.
+## License
 
-## Known Limitations
-
-- The application uses local SQLite storage and has no authentication or multi-user model.
-- Automated coverage currently focuses on the service layer rather than controllers or Razor views.
-- Charts, reminders, rewards, and achievements are not implemented.
+A project license has not yet been selected. Upstream library licenses are retained with the third-party assets.
