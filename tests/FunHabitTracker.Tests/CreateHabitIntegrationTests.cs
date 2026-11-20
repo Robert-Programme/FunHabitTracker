@@ -92,6 +92,51 @@ public class CreateHabitIntegrationTests
         Assert.AreEqual(HttpStatusCode.OK, (await client.GetAsync("/Home/Today")).StatusCode);
     }
 
+    [TestMethod]
+    public async Task QuickCreate_OverlongName_RejectsWithoutSaving()
+    {
+        var response = await PostQuick(new string('x', 201), "Daily");
+        Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+        using var scope = application.Services.CreateScope();
+        Assert.AreEqual(0, await scope.ServiceProvider.GetRequiredService<AppDbContext>().Habits.CountAsync());
+    }
+
+    [DataTestMethod]
+    [DataRow(null)]
+    [DataRow("")]
+    [DataRow(" ")]
+    public async Task QuickCreate_BlankFrequency_UsesDaily(string frequency)
+    {
+        var response = await PostQuick("Read", frequency);
+        Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode);
+        using var scope = application.Services.CreateScope();
+        Assert.AreEqual("Daily", (await scope.ServiceProvider.GetRequiredService<AppDbContext>().Habits.SingleAsync()).Frequency);
+    }
+
+    [DataTestMethod]
+    [DataRow(0)]
+    [DataRow(200)]
+    public async Task QuickCreate_NameBoundary_IsValidated(int length)
+    {
+        var response = await PostQuick(new string('x', length), "Daily");
+        Assert.AreEqual(length == 0 ? HttpStatusCode.BadRequest : HttpStatusCode.Redirect, response.StatusCode);
+        using var scope = application.Services.CreateScope();
+        Assert.AreEqual(length == 0 ? 0 : 1, await scope.ServiceProvider.GetRequiredService<AppDbContext>().Habits.CountAsync());
+    }
+
+    private async Task<HttpResponseMessage> PostQuick(string name, string frequency)
+    {
+        var html = await client.GetStringAsync("/Home/Today");
+        var token = Regex.Match(html, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
+        Assert.IsTrue(token.Success);
+        var values = new Dictionary<string, string> {
+            ["name"] = name,
+            ["__RequestVerificationToken"] = WebUtility.HtmlDecode(token.Groups[1].Value)
+        };
+        if (frequency != null) values["frequency"] = frequency;
+        return await client.PostAsync("/Home/AddHabit", new FormUrlEncodedContent(values));
+    }
+
     private async Task<HttpResponseMessage> PostForm(string name)
     {
         var html = await client.GetStringAsync("/Habits/Create");
