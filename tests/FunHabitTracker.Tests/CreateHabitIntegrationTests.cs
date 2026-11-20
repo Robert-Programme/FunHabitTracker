@@ -137,6 +137,23 @@ public class CreateHabitIntegrationTests
         return await client.PostAsync("/Home/AddHabit", new FormUrlEncodedContent(values));
     }
 
+    [DataTestMethod]
+    [DataRow(null)]
+    [DataRow("invalid")]
+    [DataRow("-1")]
+    [DataRow("99999")]
+    public async Task Toggle_InvalidId_ReturnsControlledResponse(string id)
+    {
+        var html = await client.GetStringAsync("/Home/Today");
+        var token = Regex.Match(html, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
+        var values = new Dictionary<string, string> { ["__RequestVerificationToken"] = WebUtility.HtmlDecode(token.Groups[1].Value) };
+        if (id != null) values["habitId"] = id;
+        var response = await client.PostAsync("/Home/ToggleToday", new FormUrlEncodedContent(values));
+        Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        using var scope = application.Services.CreateScope();
+        Assert.AreEqual(0, await scope.ServiceProvider.GetRequiredService<AppDbContext>().HabitCompletions.CountAsync());
+    }
+
     private async Task<HttpResponseMessage> PostForm(string name)
     {
         var html = await client.GetStringAsync("/Habits/Create");
