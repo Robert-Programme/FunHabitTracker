@@ -30,6 +30,7 @@ Run from the repository root:
 ```powershell
 dotnet restore
 dotnet test
+node --test tests/js/site.test.cjs
 dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
 ```
 
@@ -56,7 +57,7 @@ ASP.NET Data Protection keys are stored under `src/FunHabitTracker/.aspnet-data-
 
 ## Test Notes
 
-Service tests cover `HabitService` CRUD behavior with EF Core InMemory. `CreateHabitIntegrationTests` uses WebApplicationFactory and an isolated SQLite in-memory database to cover the create form, validation, persistence, antiforgery, and local validation scripts in Development and Production. These tests run with the normal `dotnet test` command.
+Service tests cover `HabitService` CRUD behavior with EF Core InMemory. `CreateHabitIntegrationTests` uses WebApplicationFactory and an isolated SQLite in-memory database to cover the create form, validation, persistence, antiforgery, and local validation scripts in Development and Production. These tests run with the normal `dotnet test` command. The JavaScript regression uses Node.js 20+ and the built-in test runner; no npm install is needed.
 
 Pinned browser validation libraries, upstream licenses, source URLs, and checksums are under `src/FunHabitTracker/wwwroot/lib/`. If changing dashboard behavior, add controller or integration tests rather than relying only on service tests.
 
