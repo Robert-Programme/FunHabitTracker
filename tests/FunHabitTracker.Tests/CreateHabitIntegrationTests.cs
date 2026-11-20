@@ -47,7 +47,7 @@ public class CreateHabitIntegrationTests
         StringAssert.Contains(await response.Content.ReadAsStringAsync(), "name=\"Name\"");
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(0)]
     [DataRow(201)]
     public async Task Create_InvalidPost_RendersErrorsWithoutSaving(int nameLength)
@@ -101,7 +101,7 @@ public class CreateHabitIntegrationTests
         Assert.AreEqual(0, await scope.ServiceProvider.GetRequiredService<AppDbContext>().Habits.CountAsync());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("")]
     [DataRow(" ")]
@@ -113,7 +113,7 @@ public class CreateHabitIntegrationTests
         Assert.AreEqual("Daily", (await scope.ServiceProvider.GetRequiredService<AppDbContext>().Habits.SingleAsync()).Frequency);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(0)]
     [DataRow(200)]
     public async Task QuickCreate_NameBoundary_IsValidated(int length)
@@ -137,7 +137,7 @@ public class CreateHabitIntegrationTests
         return await client.PostAsync("/Home/AddHabit", new FormUrlEncodedContent(values));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(null)]
     [DataRow("invalid")]
     [DataRow("-1")]
@@ -168,7 +168,7 @@ public class CreateHabitIntegrationTests
             }));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("Development")]
     [DataRow("Production")]
     public async Task Create_ValidationScripts_AreLocalAndLoadInDependencyOrder(string environment)
