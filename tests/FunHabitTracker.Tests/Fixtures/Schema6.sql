@@ -18,5 +18,3 @@ CREATE TABLE "HabitCompletions" (
 
 
 CREATE UNIQUE INDEX "IX_HabitCompletions_HabitId_Date" ON "HabitCompletions" ("HabitId", "Date");
-
-
