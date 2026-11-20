@@ -5,6 +5,7 @@ using FunHabitTracker.Services;
 using FunHabitTracker.ViewModels;
 using FunHabitTracker.Models;
 using FunHabitTracker.Data;
+using FunHabitTracker.InputModels;
 
 namespace FunHabitTracker.Controllers
 {
@@ -88,19 +89,10 @@ namespace FunHabitTracker.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddHabit(string name, string description, string frequency)
+        public IActionResult AddHabit(CreateHabitInput input)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return BadRequest("Name is required");
-            }
-
-            var habit = new Habit
-            {
-                Name = name,
-                Description = description,
-                Frequency = frequency
-            };
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var habit = input.ToHabit();
 
             _habitService.AddHabit(habit);
 
