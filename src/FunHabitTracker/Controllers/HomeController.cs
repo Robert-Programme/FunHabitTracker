@@ -29,28 +29,21 @@ namespace FunHabitTracker.Controllers
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
             
-            // Get all active habits
-            var activeHabits = _context.Habits
-                .Where(h => h.IsActive)
-                .ToList();
-
-            var viewModel = new TodayViewModel
-            {
-                Date = today,
-                Habits = activeHabits.Select(habit =>
+            var habits = (
+                from habit in _context.Habits
+                where habit.IsActive
+                join completion in _context.HabitCompletions.Where(c => c.Date == today)
+                    on habit.Id equals completion.HabitId into dailyCompletions
+                from completion in dailyCompletions.DefaultIfEmpty()
+                select new TodayHabitViewModel
                 {
-                    var completion = _context.HabitCompletions
-                        .FirstOrDefault(hc => hc.HabitId == habit.Id && hc.Date == today);
+                    HabitId = habit.Id,
+                    Name = habit.Name,
+                    Description = habit.Description,
+                    IsDoneToday = completion != null && completion.IsDone
+                }).ToList();
 
-                    return new TodayHabitViewModel
-                    {
-                        HabitId = habit.Id,
-                        Name = habit.Name,
-                        Description = habit.Description,
-                        IsDoneToday = completion?.IsDone ?? false
-                    };
-                }).ToList()
-            };
+            var viewModel = new TodayViewModel { Date = today, Habits = habits };
 
             return View(viewModel);
         }
