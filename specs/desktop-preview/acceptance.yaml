@@ -1,0 +1,85 @@
+{
+  "requirements": [
+    {
+      "id": "PRESENCE-001",
+      "statement": "Desktop availability and start at sign-in remain explicit, reversible, and quiet.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Tray owner remains available", "Autostart is opt-in", "Explicit Quit stops the host"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopLifecycleTests.cs", "tests/FunHabitTracker.Desktop.Tests/DesktopSettingsTests.cs"], "evidence": ["artifacts/evidence/desktop-lifecycle.md"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/DesktopCoordinator.cs", "src/FunHabitTracker.Desktop/DesktopSettings.cs"]
+    },
+    {
+      "id": "PRESENCE-002",
+      "statement": "A compact Today surface supports every daily outcome through the existing local domain rules.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["All due habits render", "Done, Skipped, and Pending persist", "Full application remains reachable"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/CompactTodayTests.cs"], "evidence": ["artifacts/evidence/compact-today-desktop.png"] },
+      "code_refs": ["src/FunHabitTracker/Views/Home/Compact.cshtml", "src/FunHabitTracker/Controllers/HomeController.cs"]
+    },
+    {
+      "id": "PRESENCE-003",
+      "statement": "Desktop activation is single-instance and meets cold and warm interaction budgets.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Duplicate launch reuses owner", "Warm activation under one second", "Cold shell ready under three seconds"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopLifecycleTests.cs"], "evidence": ["artifacts/evidence/desktop-launch-performance.json", "artifacts/evidence/desktop-lifecycle.md"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/Activation.cs", "src/FunHabitTracker.Desktop/DesktopCoordinator.cs"]
+    },
+    {
+      "id": "PRESENCE-004",
+      "statement": "Compact and full desktop workflows are offline, private, keyboard accessible, and responsive.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["No non-loopback requests", "Accessible status names", "Long and narrow content remains usable"],
+      "verification": { "tests": ["tests/browser/desktop-acceptance.cjs", "tests/FunHabitTracker.Tests/CompactTodayTests.cs"], "evidence": ["artifacts/evidence/desktop-offline-network-log.json", "artifacts/evidence/compact-today-mobile-width.png"] },
+      "code_refs": ["src/FunHabitTracker/wwwroot/css/site.css", "src/FunHabitTracker/wwwroot/js/site.js"]
+    },
+    {
+      "id": "PRESENCE-005",
+      "statement": "Desktop startup and lifecycle failures provide diagnostics without resetting local data.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Failures are logged", "Recovery paths are visible", "Existing data is retained"],
+      "verification": { "tests": ["tests/FunHabitTracker.Desktop.Tests/DesktopFailureTests.cs"], "evidence": ["artifacts/evidence/desktop-startup-failure.md"] },
+      "code_refs": ["src/FunHabitTracker.Desktop/App.xaml.cs", "src/FunHabitTracker.Desktop/DesktopDiagnostics.cs"]
+    },
+    {
+      "id": "DIST-001",
+      "statement": "Packaging produces a complete static website publishing bundle with exact integrity metadata.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Manifest and installer agree", "Required documents present", "Static hosting needs no application server"],
+      "verification": { "tests": ["tests/factory/test_release_bundle.py"], "evidence": ["artifacts/evidence/website-bundle-inventory.json"] },
+      "code_refs": ["installer/package.ps1", "ci/release_bundle.py"]
+    },
+    {
+      "id": "DIST-002",
+      "statement": "Preview and production artifacts report and enforce their actual signature state.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Unsigned preview disclosed", "Unsigned production rejected", "Secrets excluded"],
+      "verification": { "tests": ["tests/factory/test_release_bundle.py"], "evidence": ["artifacts/evidence/release-signature-report.json"] },
+      "documentation": ["docs/preview-trust.md", "docs/desktop-release-decisions.md"]
+    },
+    {
+      "id": "DIST-003",
+      "statement": "Offline install, update, and removal manage the desktop shell while preserving user data by default.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Bundled runtime installs offline", "Update preserves data and settings", "Normal removal preserves data"],
+      "verification": { "evidence": ["artifacts/evidence/windows-clean-install.md", "artifacts/evidence/windows-upgrade-uninstall.md"] },
+      "code_refs": ["installer/install.ps1", "installer/uninstall.ps1", "installer/verify.ps1"]
+    },
+    {
+      "id": "DIST-004",
+      "statement": "Only the exact package that passes specification, build, test, security, desktop, offline, and installer gates is releasable.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Provenance names exact digest", "Mandatory failures block release", "Evidence paths resolve"],
+      "verification": { "tests": ["tests/factory/test_factory.py", "tests/factory/test_release_bundle.py"], "evidence": ["artifacts/evidence/release-provenance.json"] },
+      "code_refs": ["ci/factory.py", ".github/workflows/factory.yml"]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "fun-habit-tracker-factory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenSpec and verification gates for FunHabitTracker.",
+  "scripts": {
+    "openspec:validate": "openspec validate --all --strict --no-interactive",
+    "factory:spec": "python ci/factory.py verify-spec",
+    "factory:build": "python ci/factory.py verify-build",
+    "factory:test": "python ci/factory.py verify-tests",
+    "factory:security": "python ci/factory.py verify-security",
+    "factory:all": "python ci/factory.py all"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "1.10.0"
+  }
+}

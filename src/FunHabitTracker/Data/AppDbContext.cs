@@ -22,6 +22,14 @@ namespace FunHabitTracker.Data
                 .HasMaxLength(200)
                 .IsRequired();
 
+            modelBuilder.Entity<Habit>()
+                .Property(h => h.RecurrenceType)
+                .HasConversion<int>();
+
+            modelBuilder.Entity<Habit>()
+                .Property(h => h.ScheduledDays)
+                .HasConversion<int>();
+
             // Configure HabitCompletion
             modelBuilder.Entity<HabitCompletion>()
                 .HasOne(hc => hc.Habit)
@@ -33,6 +41,15 @@ namespace FunHabitTracker.Data
             modelBuilder.Entity<HabitCompletion>()
                 .HasIndex(hc => new { hc.HabitId, hc.Date })
                 .IsUnique();
+
+            modelBuilder.Entity<HabitCompletion>()
+                .Property(hc => hc.Outcome)
+                .HasConversion<int>();
+
+            modelBuilder.Entity<HabitCompletion>()
+                .ToTable(table => table.HasCheckConstraint(
+                    "CK_HabitCompletions_Outcome",
+                    "Outcome IN (1, 2)"));
         }
     }
 }

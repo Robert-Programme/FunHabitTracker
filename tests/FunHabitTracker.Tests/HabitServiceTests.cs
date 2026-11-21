@@ -12,7 +12,7 @@ namespace FunHabitTracker.Tests
     [TestClass]
     public class HabitServiceTests
     {
-        private HabitService _habitService;
+        private HabitService _habitService = null!;
 
         [TestInitialize]
         public void Setup()
@@ -46,6 +46,7 @@ namespace FunHabitTracker.Tests
             _habitService.UpdateHabit(habit);
 
             var updatedHabit = _habitService.GetHabitById(1);
+            Assert.IsNotNull(updatedHabit);
             Assert.AreEqual("Morning Exercise", updatedHabit.Name);
         }
 

@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31913.123
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -6,19 +6,39 @@ Project("{E53D3E8A-6B6D-4B6D-8B6D-8B6D8B6D8B6D}") = "FunHabitTracker", "src\FunH
 EndProject
 Project("{E53D3E8A-6B6D-4B6D-8B6D-8B6D8B6D8B6D}") = "FunHabitTracker.Tests", "tests\FunHabitTracker.Tests\FunHabitTracker.Tests.csproj", "{K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0BD6ED70-A301-4B86-8351-5EE5BE87602E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunHabitTracker.Desktop", "src\FunHabitTracker.Desktop\FunHabitTracker.Desktop.csproj", "{E6CC2344-869E-4B78-A1FE-E9B4D920CA96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A096C56C-FC03-4BE7-8EF8-E3DE0B400D52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunHabitTracker.Desktop.Tests", "tests\FunHabitTracker.Desktop.Tests\FunHabitTracker.Desktop.Tests.csproj", "{A92C0149-F073-4E90-92BC-5CE0D0A1C48E}"
+EndProject
 Global
-    GlobalSection(SolutionConfigurationPlatforms) = preSolution
-        Debug|Any CPU = Debug|Any CPU
-        Release|Any CPU = Release|Any CPU
-    EndGlobalSection
-    GlobalSection(ProjectConfigurationPlatforms) = postSolution
-        {A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Release|Any CPU.Build.0 = Release|Any CPU
-        {K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-        {K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-        {K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-        {K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Release|Any CPU.Build.0 = Release|Any CPU
-    EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7A8B-9C0D-E1F2G3H4I5J6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{K7L8M9N0-O1P2-Q3R4-S5T6-U7V8W9X0Y1Z2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6CC2344-869E-4B78-A1FE-E9B4D920CA96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6CC2344-869E-4B78-A1FE-E9B4D920CA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6CC2344-869E-4B78-A1FE-E9B4D920CA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6CC2344-869E-4B78-A1FE-E9B4D920CA96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A92C0149-F073-4E90-92BC-5CE0D0A1C48E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A92C0149-F073-4E90-92BC-5CE0D0A1C48E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A92C0149-F073-4E90-92BC-5CE0D0A1C48E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A92C0149-F073-4E90-92BC-5CE0D0A1C48E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E6CC2344-869E-4B78-A1FE-E9B4D920CA96} = {0BD6ED70-A301-4B86-8351-5EE5BE87602E}
+		{A92C0149-F073-4E90-92BC-5CE0D0A1C48E} = {A096C56C-FC03-4BE7-8EF8-E3DE0B400D52}
+	EndGlobalSection
 EndGlobal

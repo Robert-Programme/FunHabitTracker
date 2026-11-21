@@ -1,0 +1,22 @@
+@model FunHabitTracker.ViewModels.HabitInputModel
+@using FunHabitTracker.Models
+@{
+    var selected = Model.ScheduledDays;
+}
+<div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+<div class="field"><label asp-for="Name"></label><input asp-for="Name" autocomplete="off" /><span asp-validation-for="Name"></span></div>
+<div class="field"><label asp-for="Description"></label><textarea asp-for="Description" rows="3"></textarea><span asp-validation-for="Description"></span></div>
+<div class="form-grid">
+    <div class="field"><label asp-for="StartDate"></label><input asp-for="StartDate" type="date" /><span asp-validation-for="StartDate"></span></div>
+    <div class="field"><label asp-for="RecurrenceType"></label><select asp-for="RecurrenceType" data-recurrence><option value="Daily">Taeglich</option><option value="SelectedWeekdays">Bestimmte Wochentage</option></select></div>
+</div>
+<fieldset class="weekday-field" data-weekdays>
+    <legend>Wochentage</legend>
+    <div class="weekday-options">
+        @foreach (var day in new[] { (ScheduledDays.Monday, "Mo"), (ScheduledDays.Tuesday, "Di"), (ScheduledDays.Wednesday, "Mi"), (ScheduledDays.Thursday, "Do"), (ScheduledDays.Friday, "Fr"), (ScheduledDays.Saturday, "Sa"), (ScheduledDays.Sunday, "So") })
+        {
+            <label><input type="checkbox" name="weekdays" value="@((int)day.Item1)" checked="@selected.HasFlag(day.Item1)" /><span>@day.Item2</span></label>
+        }
+    </div>
+    <span asp-validation-for="ScheduledDays"></span>
+</fieldset>

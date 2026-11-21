@@ -1,0 +1,58 @@
+name: Factory Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  factory-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Set up .NET SDK and runtime
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            6.0.x
+
+      - name: Install OpenSpec
+        run: npm ci
+
+      - name: Validate OpenSpec
+        run: npm run openspec:validate
+        env:
+          OPENSPEC_TELEMETRY: "0"
+
+      - name: Run factory gates
+        run: npm run factory:all
+
+      - name: Upload factory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: factory-evidence
+          if-no-files-found: warn
+          path: |
+            reports/
+            artifacts/

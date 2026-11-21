@@ -1,0 +1,113 @@
+{
+  "requirements": [
+    {
+      "id": "TRACK-001",
+      "statement": "Today presents due habits with persistent Pending, Done, and Skipped outcomes.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Due habits are shown once", "Outcome changes persist", "Unknown habits are rejected"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/DailyTrackingServiceTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"], "evidence": ["artifacts/evidence/local-restart-today.md"] },
+      "code_refs": ["src/FunHabitTracker/Services/DailyTrackingService.cs", "src/FunHabitTracker/Views/Home/Today.cshtml"]
+    },
+    {
+      "id": "TRACK-002",
+      "statement": "History and streak summaries follow scheduled, skipped, and missed date semantics.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Unscheduled dates are ignored", "Skipped dates do not extend or break", "Missed scheduled dates break"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/StreakCalculatorTests.cs"] },
+      "code_refs": ["src/FunHabitTracker/Services/StreakCalculator.cs", "src/FunHabitTracker/Views/Habits/History.cshtml"]
+    },
+    {
+      "id": "SCHED-001",
+      "statement": "Users can create, edit, archive, restore, and review habits without losing history.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Validated create and edit", "Archive removes future due items", "Restore preserves history"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"] },
+      "code_refs": ["src/FunHabitTracker/Services/HabitService.cs", "src/FunHabitTracker/Controllers/HabitsController.cs"]
+    },
+    {
+      "id": "SCHED-002",
+      "statement": "Daily and selected-weekday recurrence is evaluated in local calendar time.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Start date enforced", "Selected weekdays enforced", "Midnight and DST deterministic"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/RecurrenceEvaluatorTests.cs", "tests/FunHabitTracker.Tests/LocalDateProviderTests.cs"] },
+      "code_refs": ["src/FunHabitTracker/Services/RecurrenceService.cs", "src/FunHabitTracker/Infrastructure/Clock.cs"]
+    },
+    {
+      "id": "DATA-001",
+      "statement": "SQLite uses a stable per-user location and preserves supported legacy data through migrations.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Path independent from working directory", "Legacy database adopted", "Safety backup created"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/AppPathsTests.cs", "tests/FunHabitTracker.Tests/LegacyDatabaseMigrationTests.cs"], "evidence": ["artifacts/evidence/data-path-and-upgrade.md"] },
+      "code_refs": ["src/FunHabitTracker/Infrastructure/AppPaths.cs", "src/FunHabitTracker/Infrastructure/DatabaseInitializer.cs"]
+    },
+    {
+      "id": "DATA-002",
+      "statement": "Relational data operations are constrained, atomic, and fail with actionable diagnostics.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Unique outcomes", "Atomic multi-record operations", "Startup failure recovery guidance"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/DailyTrackingServiceTests.cs", "tests/FunHabitTracker.Tests/BackupServiceTests.cs", "tests/FunHabitTracker.Tests/ApplicationSmokeTests.cs"] },
+      "code_refs": ["src/FunHabitTracker/Data/AppDbContext.cs", "src/FunHabitTracker/Program.cs"]
+    },
+    {
+      "id": "BACKUP-001",
+      "statement": "JSON export is complete, local, and versioned.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["All user data exported", "Format metadata included", "No external request"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/BackupServiceTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"], "evidence": ["artifacts/evidence/json-schema-v1.md"] },
+      "documentation": ["docs/json-backup-v1.md"]
+    },
+    {
+      "id": "BACKUP-002",
+      "statement": "JSON import validates before confirmed atomic replacement and safety backup.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Malformed input rejected", "Preview and confirmation required", "Failure preserves original data"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/BackupServiceTests.cs", "tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"], "evidence": ["artifacts/evidence/import-security-cases.md"] },
+      "code_refs": ["src/FunHabitTracker/Services/BackupService.cs"]
+    },
+    {
+      "id": "BACKUP-003",
+      "statement": "Consistent SQLite backup and validated controlled restore are available.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Backup passes integrity check", "Incompatible database rejected", "Previous database retained"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/BackupServiceTests.cs"], "evidence": ["artifacts/evidence/sqlite-restore-interruption.md"] },
+      "documentation": ["docs/backup-restore.md"]
+    },
+    {
+      "id": "OFFLINE-001",
+      "statement": "Windows installation, launch, upgrade, and uninstall are offline and self-contained.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["Self-contained bundle installs", "Loopback single instance launches", "User data preserved by default"],
+      "verification": { "evidence": ["artifacts/evidence/windows-clean-install.md", "artifacts/evidence/windows-upgrade-uninstall.md"] },
+      "documentation": ["docs/installation.md", "docs/installer-decision.md"],
+      "code_refs": ["installer/package.ps1", "installer/verify.ps1"]
+    },
+    {
+      "id": "OFFLINE-002",
+      "statement": "Core journeys use only packaged local runtime resources and work without JavaScript.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": ["No non-loopback resources", "Core forms operate without JavaScript", "Offline export and import work"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"], "evidence": ["artifacts/evidence/offline-network-log.json"] },
+      "code_refs": ["src/FunHabitTracker/Views/Shared/_Layout.cshtml", "src/FunHabitTracker/wwwroot/js/site.js"]
+    },
+    {
+      "id": "OFFLINE-003",
+      "statement": "The today-centered application shell is responsive and accessible.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": ["Usable at 360 CSS pixels", "Keyboard and semantic labels", "Status not color-only"],
+      "verification": { "tests": ["tests/FunHabitTracker.Tests/OfflineCoreJourneyTests.cs"], "evidence": ["artifacts/evidence/today-desktop.png", "artifacts/evidence/today-mobile.png"] },
+      "code_refs": ["src/FunHabitTracker/wwwroot/css/site.css", "src/FunHabitTracker/Views/Home/Today.cshtml"]
+    }
+  ]
+}

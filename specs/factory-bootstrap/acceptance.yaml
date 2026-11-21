@@ -1,0 +1,82 @@
+{
+  "feature": "factory-bootstrap",
+  "version": 1,
+  "requirements": [
+    {
+      "id": "FACTORY-001",
+      "statement": "Material changes use versioned OpenSpec artifacts before completion.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": [
+        {
+          "given": "a material repository change",
+          "when": "the change is evaluated for completion",
+          "then": "proposal, design, requirement delta, and tasks are present"
+        }
+      ],
+      "verification": {
+        "acceptance": ["tests/factory/test_factory.py"],
+        "contract": ["openspec/config.yaml"]
+      },
+      "documentation": ["docs/factory-process.md"],
+      "code_refs": [".agents/skills/openspec-propose/SKILL.md", "AGENTS.md"]
+    },
+    {
+      "id": "FACTORY-002",
+      "statement": "Factory gates execute the real .NET project toolchain.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": [
+        {
+          "given": "the repository dependencies are installed",
+          "when": "npm run factory:all executes",
+          "then": "restore, build, format, MSTest, and factory tests run"
+        }
+      ],
+      "verification": {
+        "acceptance": ["tests/factory/test_factory.py"],
+        "contract": ["quality-policy.yaml"]
+      },
+      "documentation": ["docs/factory-process.md"],
+      "code_refs": ["ci/factory.py", "package.json"]
+    },
+    {
+      "id": "FACTORY-003",
+      "statement": "Requirements are traceable and security gates scan dependencies and secrets.",
+      "risk": "high",
+      "status": "resolved",
+      "acceptance": [
+        {
+          "given": "a requirement or dependency change",
+          "when": "traceability and security gates run",
+          "then": "missing evidence, vulnerable packages, and secret patterns block the candidate"
+        }
+      ],
+      "verification": {
+        "acceptance": ["tests/factory/test_factory.py"],
+        "security": ["reports/security.sarif"]
+      },
+      "documentation": ["docs/factory-process.md"],
+      "code_refs": ["ci/factory.py", "quality-policy.yaml"]
+    },
+    {
+      "id": "FACTORY-004",
+      "statement": "CI runs the local factory entry point and uploads machine evidence.",
+      "risk": "medium",
+      "status": "resolved",
+      "acceptance": [
+        {
+          "given": "a pull request or push to main",
+          "when": "GitHub Actions starts",
+          "then": "OpenSpec and factory gates run and evidence is uploaded"
+        }
+      ],
+      "verification": {
+        "acceptance": ["tests/factory/test_factory.py"],
+        "contract": [".github/workflows/factory.yml"]
+      },
+      "documentation": ["docs/factory-process.md"],
+      "code_refs": ["ci/factory.py", ".github/workflows/factory.yml"]
+    }
+  ]
+}

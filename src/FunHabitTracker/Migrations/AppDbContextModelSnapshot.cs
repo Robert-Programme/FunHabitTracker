@@ -15,7 +15,7 @@ namespace FunHabitTracker.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.30");
 
             modelBuilder.Entity("FunHabitTracker.Models.Habit", b =>
                 {
@@ -24,6 +24,9 @@ namespace FunHabitTracker.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ArchivedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
@@ -36,9 +39,24 @@ namespace FunHabitTracker.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsArchived")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RecurrenceType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ScheduledDays")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -61,12 +79,18 @@ namespace FunHabitTracker.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Outcome")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HabitId", "Date")
                         .IsUnique();
 
-                    b.ToTable("HabitCompletions");
+                    b.ToTable("HabitCompletions", t =>
+                        {
+                            t.HasCheckConstraint("CK_HabitCompletions_Outcome", "Outcome IN (1, 2)");
+                        });
                 });
 
             modelBuilder.Entity("FunHabitTracker.Models.HabitCompletion", b =>

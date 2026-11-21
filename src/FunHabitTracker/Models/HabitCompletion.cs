@@ -6,6 +6,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FunHabitTracker.Models
 {
+    public enum HabitOutcome
+    {
+        Done = 1,
+        Skipped = 2
+    }
+
     public class HabitCompletion
     {
         public int Id { get; set; }
@@ -20,5 +26,7 @@ namespace FunHabitTracker.Models
         public DateOnly Date { get; set; }
 
         public bool IsDone { get; set; }
+
+        public HabitOutcome Outcome { get; set; } = HabitOutcome.Done;
     }
 }

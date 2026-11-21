@@ -1,0 +1,31 @@
+schema: spec-driven
+
+context: |
+  Language: en
+  All artifacts must be written in en.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+  Project: FunHabitTracker, an ASP.NET Core MVC application targeting net6.0.
+  Build: dotnet build FunHabitTracker.sln --configuration Release.
+  Tests: dotnet test FunHabitTracker.sln.
+  Factory gates: npm run factory:all.
+  Every material requirement uses a stable ID matching FACTORY-001 style,
+  explicit acceptance scenarios, a risk classification, and evidence paths.
+
+rules:
+  proposal:
+    - Include non-goals and affected project areas
+    - Identify whether database schema, security, or operations are affected
+  specs:
+    - Use stable requirement IDs in requirement headings
+    - Include at least one WHEN/THEN scenario per requirement
+  tasks:
+    - Include tests, documentation, and factory-gate verification tasks
+
+operations:
+  apply:
+    guidance:
+      - Preserve unrelated changes in dirty worktrees
+      - Run npm run factory:all before marking implementation complete
+  archive:
+    guidance:
+      - Archive only after OpenSpec, factory, and project tests pass
