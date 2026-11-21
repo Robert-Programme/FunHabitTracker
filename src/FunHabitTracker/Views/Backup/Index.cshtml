@@ -1,0 +1,12 @@
+@model FunHabitTracker.ViewModels.BackupPageModel
+@{ ViewData["Title"] = "Daten"; }
+<section class="page-heading"><div><p class="eyebrow">Lokal und unter deiner Kontrolle</p><h1>Daten</h1><p class="data-path">@Model.DataDirectory</p></div></section>
+@if (Model.Preview is not null)
+{
+    <section class="confirm-band" aria-labelledby="import-preview"><div><h2 id="import-preview">Import bestaetigen</h2><p>@Model.Preview.HabitCount Habits und @Model.Preview.OutcomeCount Verlaufseintraege vom @Model.Preview.ExportedAtUtc.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ersetzen den aktuellen Datenbestand.</p></div><form asp-action="ConfirmJson" method="post"><input type="hidden" name="token" value="@Model.Preview.Token" /><button class="button button-danger" type="submit">Daten ersetzen</button></form></section>
+}
+<div class="data-sections">
+    <section class="data-section"><div><h2>JSON-Backup</h2><p>Portables, lesbares Format fuer Habits, Zeitplaene und Verlauf.</p></div><div class="data-actions"><form asp-action="ExportJson" method="post"><button class="button button-primary" type="submit">JSON exportieren</button></form><form asp-action="PreviewJson" method="post" enctype="multipart/form-data"><label class="file-field"><span>JSON-Datei</span><input type="file" name="file" accept="application/json,.json" required /></label><button class="button button-secondary" type="submit">Import pruefen</button></form></div></section>
+    <section class="data-section"><div><h2>SQLite-Sicherung</h2><p>Vollstaendige technische Sicherung der lokalen Datenbank.</p></div><div class="data-actions"><form asp-action="ExportDatabase" method="post"><button class="button button-primary" type="submit">SQLite sichern</button></form><form asp-action="RestoreDatabase" method="post" enctype="multipart/form-data"><label class="file-field"><span>SQLite-Datei</span><input type="file" name="file" accept="application/vnd.sqlite3,.db" required /></label><button class="button button-danger" type="submit">SQLite wiederherstellen</button></form></div></section>
+</div>
+<p class="privacy-note">Backups enthalten deine persoenliche Habit-Historie. Sie werden ausschliesslich lokal verarbeitet und nie hochgeladen.</p>

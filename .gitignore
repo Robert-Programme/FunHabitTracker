@@ -26,11 +26,23 @@ habits.db
 **/TestResults/
 **/coverage/
 
+## Factory output
+node_modules/
+__pycache__/
+*.py[cod]
+reports/*.sarif
+artifacts/*.json
+artifacts/*.jsonl
+artifacts/installer/
+artifacts/*.zip
+artifacts/*.zip.sha256
+artifacts/website/
+installer/runtime/*.exe
+.codex-log/
+.ai/
+
 ## Misc
 *.DS_Store
 *.class
 bin-debug/
-
-# Python quality-check caches
-__pycache__/
-*.pyc
+.tmp/

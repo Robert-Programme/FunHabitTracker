@@ -1,44 +1,74 @@
 # Fun Habit Tracker
 
-A small single-user ASP.NET Core MVC app for tracking daily habits with SQLite.
+Fun Habit Tracker is a Windows-first, local-first habit application. Its core workflows
+run on a loopback-only ASP.NET Core host, keep data in SQLite, and do not require an
+internet connection.
 
-## Implemented features
+## Features
 
-- Create habits with an optional description and active status.
-- List all habits and show active habits on today's dashboard.
-- Mark habits done or undone for the current day, preserving earlier completion records.
-- Validate names and default an empty frequency to Daily.
+- Today view with reversible Pending, Done, and Skipped states and a one-click completion marker.
+- Daily or selected-weekday schedules with a local start date.
+- Habit create, edit, archive, restore, history, completion summaries, and streaks.
+- Versioned JSON export/import with preview, confirmation, validation, and safety backup.
+- Consistent SQLite backup and validated restore.
+- Responsive server-rendered UI that keeps core actions functional without JavaScript.
+- Full-view navigation that clearly identifies the current Today, Habits, or Data section.
+- Compact Windows desktop window with taskbar-safe Minimize, close-to-tray, notification-area
+  access, exclusive compact/full switching, and optional start at sign in.
+- Self-contained `win-x64` publish with an offline WebView2 and PowerShell installer bundle.
 
-Charts, reminders, achievements, and weekly scheduling are not implemented.
+Cloud sync, accounts, mobile-native packaging, rewards, and reminders are not part of the
+current local-first release.
 
-## Run locally
+## Requirements
 
-Install the .NET 10 SDK pinned in `global.json`. Node.js 20+ is needed only for the JavaScript test.
+- Development: .NET SDK `8.0.204`, pinned by `global.json`; Node.js/npm for OpenSpec and
+  Factory gates; Python 3 for the repository Factory runner.
+- Installed app: supported 64-bit Windows. The release bundle includes the .NET runtime.
 
-```sh
-git clone https://github.com/Robert-Programme/FunHabitTracker.git
-cd FunHabitTracker
-dotnet restore
-dotnet run --project src/FunHabitTracker --urls http://localhost:5016
+## Develop
+
+```powershell
+dotnet restore FunHabitTracker.sln
+dotnet test FunHabitTracker.sln
+$env:ASPNETCORE_URLS='http://127.0.0.1:5016'
+dotnet run --project src\FunHabitTracker\FunHabitTracker.csproj
+dotnet run --project src\FunHabitTracker.Desktop\FunHabitTracker.Desktop.csproj
 ```
 
-Open http://localhost:5016/Home/Today. No account or login is required; the current app has a shared single-user data model.
+Use an isolated data directory when developing or testing manually:
 
-SQLite is created as `habits.db` relative to the process working directory. Startup fails if that path cannot be initialized. Data Protection keys are persisted under the app content root in `.aspnet-data-protection-keys/`. These runtime files are ignored by Git. `EnsureCreated` initializes new databases; existing-schema upgrades require a separate migration strategy.
+```powershell
+$env:FunHabitTracker__DataDirectory="$PWD\.tmp\local-data"
+```
+
+The default data root is `%LOCALAPPDATA%\FunHabitTracker`. See
+`docs/backup-restore.md` before moving or restoring database files.
 
 ## Verify
 
-```sh
-dotnet test --configuration Release
-node --test tests/js/site.test.cjs
-dotnet format FunHabitTracker.sln --verify-no-changes --no-restore
-dotnet list FunHabitTracker.sln package --vulnerable --include-transitive
+```powershell
+npm ci
+npm run openspec:validate
+npm run factory:all
 ```
 
-Tests include SQLite-backed HTTP/controller regressions, an EF Core 6 schema compatibility fixture, startup failure checks, and a shared-script regression. CI also runs CodeQL and a history secret scan. See `.github/workflows/portfolio-quality.yml` for the commit-bound checks.
+Material changes follow `AGENTS.md`, `docs/factory-process.md`, and the OpenSpec artifacts
+under `openspec/`.
 
-The browser validation libraries are served locally. Their versions, source URLs, checksums, and upstream licenses are in `src/FunHabitTracker/wwwroot/vendor/`.
+## Package
 
-## License
+```powershell
+.\installer\package.ps1
+.\installer\verify.ps1
+```
 
-A project license has not yet been selected. Upstream library licenses are retained with the third-party assets.
+The versioned static publishing bundle, ZIP, manifest, checksum, SBOM, provenance, trust
+notice, and user documents are written under `artifacts/website/`. Installation and
+uninstall behavior are documented in `docs/installation.md`.
+
+## Data safety
+
+Backups contain personal habit descriptions and history. They are processed locally and
+are never uploaded by the application. Normal uninstall preserves user data unless
+`-RemoveData` is explicitly supplied.

@@ -1,0 +1,73 @@
+@model FunHabitTracker.ViewModels.TodayDashboardModel
+@using FunHabitTracker.Models
+@using FunHabitTracker.ViewModels
+@{
+    Layout = "_CompactLayout";
+    ViewData["Title"] = "Heute kompakt";
+}
+
+<main class="compact-shell" aria-label="Heute kompakt">
+    <header class="compact-header">
+        <div>
+            <p class="eyebrow">@Model.Date.ToString("dddd, dd. MMMM")</p>
+            <h1>Heute</h1>
+        </div>
+        <div class="compact-summary" aria-label="@Model.DoneCount von @Model.DueCount erledigt">
+            <strong>@Model.DoneCount/@Model.DueCount</strong>
+            <span>erledigt</span>
+        </div>
+    </header>
+
+    @if (TempData["Error"] is string error)
+    {
+        <div class="notice notice-error" role="alert">@error</div>
+    }
+
+    @if (Model.Habits.Count == 0)
+    {
+        <section class="compact-empty">
+            <span class="compact-empty-mark" aria-hidden="true">OK</span>
+            <h2>Heute ist frei</h2>
+            <p>Keine aktiven Habits sind eingeplant.</p>
+        </section>
+    }
+    else
+    {
+        <section class="compact-habit-list" aria-label="Habits fuer heute">
+            @foreach (var habit in Model.Habits)
+            {
+                var statusClass = habit.Status switch { TodayStatus.Done => "is-done", TodayStatus.Skipped => "is-skipped", _ => "is-pending" };
+                <article class="compact-habit @statusClass">
+                    <div class="compact-habit-copy">
+                        <h2>@habit.Name</h2>
+                        <span>@(habit.Status == TodayStatus.Done ? "Erledigt" : habit.Status == TodayStatus.Skipped ? "Uebersprungen" : "Offen") · @habit.CurrentStreak Tage Serie</span>
+                    </div>
+                    <div class="compact-actions" aria-label="Status fuer @habit.Name">
+                        <form asp-action="SetOutcome" method="post" data-compact-outcome>
+                            <input type="hidden" name="habitId" value="@habit.Id" />
+                            <input type="hidden" name="outcome" value="Done" />
+                            <input type="hidden" name="returnTo" value="Compact" />
+                            <button class="compact-action done" type="submit" aria-label="@habit.Name erledigt" aria-pressed="@(habit.Status == TodayStatus.Done ? "true" : "false")">✓</button>
+                        </form>
+                        <form asp-action="SetOutcome" method="post" data-compact-outcome>
+                            <input type="hidden" name="habitId" value="@habit.Id" />
+                            <input type="hidden" name="outcome" value="Skipped" />
+                            <input type="hidden" name="returnTo" value="Compact" />
+                            <button class="compact-action skipped" type="submit" aria-label="@habit.Name ueberspringen" aria-pressed="@(habit.Status == TodayStatus.Skipped ? "true" : "false")">–</button>
+                        </form>
+                        <form asp-action="ClearOutcome" method="post" data-compact-outcome>
+                            <input type="hidden" name="habitId" value="@habit.Id" />
+                            <input type="hidden" name="returnTo" value="Compact" />
+                            <button class="compact-action pending" type="submit" aria-label="@habit.Name offen" aria-pressed="@(habit.Status == TodayStatus.Pending ? "true" : "false")">○</button>
+                        </form>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+
+    <footer class="compact-footer">
+        <a class="button button-secondary" asp-action="Today" data-open-full>Ganze App öffnen</a>
+        <span>@Model.CompletionPercent%</span>
+    </footer>
+</main>

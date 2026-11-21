@@ -1,0 +1,13 @@
+{
+  "recordedAtUtc": "2026-08-23T19:36:45.8780686Z",
+  "machine": "LAPTOP-JHIG9EOJ",
+  "os": "Microsoft Windows NT 10.0.26200.0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel",
+  "memoryGb": 15.7,
+  "existingDevelopmentColdReadyMs": 3246,
+  "existingWarmRequestMs": 58,
+  "existingWorkingSetMb": 84.4,
+  "loopback": "127.0.0.1:5021",
+  "existingInstallerBytes": 48992593,
+  "browserFallback": "Existing system-browser launcher and installer smoke evidence"
+}

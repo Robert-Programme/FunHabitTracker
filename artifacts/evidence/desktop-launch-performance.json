@@ -1,0 +1,10 @@
+{
+  "recordedAtUtc": "2026-08-23T20:07:33.2371570Z",
+  "machine": "LAPTOP-JHIG9EOJ",
+  "os": "Microsoft Windows NT 10.0.26200.0",
+  "build": "0.2.0-preview.1 development acceptance",
+  "coldShellReadyMs": 2233.3,
+  "warmActivationMs": 434.8,
+  "thresholds": { "coldMs": 3000, "warmMs": 1000 },
+  "result": "pass"
+}

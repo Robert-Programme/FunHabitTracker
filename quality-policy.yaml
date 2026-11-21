@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "project": "FunHabitTracker",
+  "job": {
+    "max_iterations": 8,
+    "max_wall_clock_minutes": 45
+  },
+  "pull_request": {
+    "mandatory": [
+      "openspec_validation",
+      "spec_traceability",
+      "restore",
+      "build",
+      "format",
+      "unit_tests",
+      "factory_tests",
+      "dependency_scan",
+      "secret_scan"
+    ],
+    "risk_based": {
+      "medium": ["integration_tests"],
+      "high": ["independent_acceptance_tests", "threat_model"],
+      "critical": ["adversarial_review", "rollback_plan"]
+    }
+  },
+  "release": {
+    "mandatory": ["sbom", "provenance", "release_evidence"]
+  },
+  "production": {
+    "direct_agent_changes": false,
+    "repair_path": "rollback_then_verified_pull_request",
+    "forbidden_autonomy_level": "A7"
+  },
+  "evidence": {
+    "required_files": [
+      "reports/security.sarif",
+      "artifacts/sbom.cdx.json",
+      "artifacts/provenance.intoto.jsonl",
+      "artifacts/release-evidence.json"
+    ]
+  }
+}

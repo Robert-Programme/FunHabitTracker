@@ -1,0 +1,22 @@
+{
+  "generatedAtUtc": "2026-11-04T22:20:53.9525829Z",
+  "product": "Fun Habit Tracker Preview",
+  "version": "0.2.0-preview.1",
+  "channel": "preview",
+  "subject": [
+    {
+      "name": "FunHabitTracker-Setup-win-x64.zip",
+      "sha256": "9ad669f46536a0c5c08da5e603ebe54fc4232551387c1759766431753fa62e89",
+      "bytes": 308121208
+    }
+  ],
+  "gates": [
+    "openspec",
+    "build",
+    "tests",
+    "factory",
+    "desktop-browser",
+    "installer",
+    "signature"
+  ]
+}

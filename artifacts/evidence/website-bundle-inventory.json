@@ -1,0 +1,56 @@
+{
+  "generatedAtUtc": "2026-11-04T22:20:54.6809175Z",
+  "root": "D:\\01_Privat\\code\\Habit\\FunHabitTracker\\artifacts\\website\\fun-habit-tracker\\0.2.0-preview.1",
+  "files": [
+    {
+      "name": "FunHabitTracker-Setup-win-x64.zip",
+      "bytes": 308121208,
+      "sha256": "9ad669f46536a0c5c08da5e603ebe54fc4232551387c1759766431753fa62e89"
+    },
+    {
+      "name": "FunHabitTracker-Setup-win-x64.zip.sha256",
+      "bytes": 101,
+      "sha256": "89cf4a7432e0ca6c50bbe8ccbb2cc5bb44ab5ab61db930b22162896154557541"
+    },
+    {
+      "name": "installation.md",
+      "bytes": 1336,
+      "sha256": "455e31b9c3b2bd45a659cb2edcc5dec49dc42dba1b2c692ba81f3689df52f184"
+    },
+    {
+      "name": "preview-trust.md",
+      "bytes": 432,
+      "sha256": "410ed148e7a47ba0792c2c840f782630e8fd73a8c27e8e576efdbc365bd0e345"
+    },
+    {
+      "name": "privacy.md",
+      "bytes": 355,
+      "sha256": "dd9db1f06bdefcac7c66a9c0a6625a5c7dc53c8cde3880ec85ec4bf46f4c96dd"
+    },
+    {
+      "name": "release-manifest.json",
+      "bytes": 907,
+      "sha256": "2c17a4f91cec3e0bd3e8fb90970e1a107650aa9733629524829620af8afea675"
+    },
+    {
+      "name": "release-notes-0.2.0-preview.1.md",
+      "bytes": 822,
+      "sha256": "f4274cd1f96df79dea44b5cbed2776e5eb9ad25771dada02177a5718bb5bec6a"
+    },
+    {
+      "name": "release-provenance.json",
+      "bytes": 498,
+      "sha256": "ac1947da66d5ba9ec9b75f3f325981e0f4695ce6b798e9aa020636c9836df625"
+    },
+    {
+      "name": "release-signature-report.json",
+      "bytes": 190,
+      "sha256": "d5b124241547bc5738672def7855e858244d2c1ab5b2a3fb1bafe4ebf3b6a05f"
+    },
+    {
+      "name": "sbom.cdx.json",
+      "bytes": 163790,
+      "sha256": "88b71e94d717fb41d11d2e0f04aa4b2871ca01faa3242dffbfff3068eff6307d"
+    }
+  ]
+}

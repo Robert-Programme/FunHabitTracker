@@ -1,0 +1,15 @@
+{
+  "capturedAt": "2026-08-23T16:12:26.426Z",
+  "page": "http://127.0.0.1:5018/Home/Today",
+  "declaredResources": [
+    "http://127.0.0.1:5018/css/site.css?v=VVm1JQXmQF6nfxUj15mHz3C8m7V9ZG-LWIMpMeYMf6M",
+    "http://127.0.0.1:5018/Home/Today",
+    "http://127.0.0.1:5018/Home/Today",
+    "http://127.0.0.1:5018/Habits",
+    "http://127.0.0.1:5018/Backup",
+    "http://127.0.0.1:5018/Habits/Create",
+    "http://127.0.0.1:5018/Habits/History/1",
+    "http://127.0.0.1:5018/js/site.js?v=F30WRTS8oC8ijqXVKoDhrKNzmRqbl2AZ70HBx7X5Zsc"
+  ],
+  "nonLoopback": []
+}
