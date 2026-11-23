@@ -28,6 +28,10 @@ current local-first release.
 
 ## Develop
 
+On Linux, run `bash scripts/start-browser.sh` to start browser mode at
+`http://127.0.0.1:5016`. The script installs the pinned SDK if needed and
+keeps development data in `.tmp/browser-data`.
+
 ```powershell
 dotnet restore FunHabitTracker.sln
 dotnet test FunHabitTracker.sln
