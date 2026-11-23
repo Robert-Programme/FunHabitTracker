@@ -35,7 +35,7 @@ fs.mkdirSync(evidence, { recursive: true });
     await page.goto(`${origin}/Habits/Create`);
     await page.getByLabel('Name').fill(name);
     await page.getByLabel('Startdatum').fill(new Date().toISOString().slice(0, 10));
-    await page.getByRole('button', { name: /Habit anlegen/i }).click();
+    await page.getByRole('button', { name: /Gewohnheit anlegen/i }).click();
     await page.waitForLoadState('networkidle');
   }
 
